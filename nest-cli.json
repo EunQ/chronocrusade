@@ -1,8 +1,41 @@
 {
   "$schema": "https://json.schemastore.org/nest-cli",
   "collection": "@nestjs/schematics",
-  "sourceRoot": "src",
+  "sourceRoot": "apps/gateway/src",
   "compilerOptions": {
-    "deleteOutDir": true
+    "deleteOutDir": true,
+    "webpack": true,
+    "tsConfigPath": "apps/gateway/tsconfig.app.json"
+  },
+  "monorepo": true,
+  "root": "apps/gateway",
+  "projects": {
+    "gateway": {
+      "type": "application",
+      "root": "apps/gateway",
+      "entryFile": "main",
+      "sourceRoot": "apps/gateway/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/gateway/tsconfig.app.json"
+      }
+    },
+    "rosette": {
+      "type": "application",
+      "root": "apps/rosette",
+      "entryFile": "main",
+      "sourceRoot": "apps/rosette/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/rosette/tsconfig.app.json"
+      }
+    },
+    "chrono": {
+      "type": "application",
+      "root": "apps/chrono",
+      "entryFile": "main",
+      "sourceRoot": "apps/chrono/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/chrono/tsconfig.app.json"
+      }
+    }
   }
 }
