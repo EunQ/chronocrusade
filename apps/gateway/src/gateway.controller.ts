@@ -1,7 +1,9 @@
-import { Controller, Get, Inject, Param, Query } from '@nestjs/common';
+import { Controller, Get, Inject, Param, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { GatewayService } from './gateway.service';
 import { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
+import { RoleGuard } from '../guards/roles.guard';
+import { Roles } from '../roles/roles.decorator';
 
 @Controller()
 export class GatewayController {
@@ -29,5 +31,17 @@ export class GatewayController {
       this.rosetteClient.send('auth/login', { loginId }),
     );
     return { token };
+  }
+
+  @Get('/auth/verify')
+  @UseGuards(RoleGuard)
+  @Roles('admin')
+  async helloB(@Req() req): Promise<string> {
+    const user = req.user;
+    console.log(user);
+    return 'test';
+    // return firstValueFrom(
+    //   this.chronoClient.send('chrono/hello-b', { user })
+    // );
   }
 }

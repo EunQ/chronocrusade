@@ -26,4 +26,11 @@ export class AuthController {
 
     return { token };
   }
+
+  @MessagePattern('auth/verify')
+  async verify(@Payload() { token }: { token: string }) {
+    const realToken = token?.split(' ')[1];
+    const user = this.jwtService.verify(realToken);
+    return user;
+  }
 }
