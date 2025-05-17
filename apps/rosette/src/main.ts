@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { RosetteModule } from './rosette.module';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
+import { AuthModule } from './auth/auth.module';
 
 async function bootstrap() {
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(

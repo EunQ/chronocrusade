@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { RosetteController } from './rosette.controller';
-import { RosetteService } from './rosette.service';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
-  imports: [],
+  imports: [AuthModule],
   controllers: [RosetteController],
-  providers: [RosetteService],
+  providers: [],
 })
 export class RosetteModule {}

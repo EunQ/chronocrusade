@@ -1,4 +1,4 @@
-import { Controller, Get, Inject } from '@nestjs/common';
+import { Controller, Get, Inject, Param, Query } from '@nestjs/common';
 import { GatewayService } from './gateway.service';
 import { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
@@ -21,5 +21,13 @@ export class GatewayController {
     const result = await firstValueFrom(result$);
     console.log(`gateway hello ${result}`);
     return result;
+  }
+
+  @Get('/login')
+  async login(@Query('loginId') loginId: string): Promise<{ token: string }> {
+    const { token } = await firstValueFrom(
+      this.rosetteClient.send('auth/login', { loginId }),
+    );
+    return { token };
   }
 }
