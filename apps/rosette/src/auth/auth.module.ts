@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { AuthController } from './auth.controller';
 import { MongooseModule } from '@nestjs/mongoose';
-import { User, UserSchema } from './dto/auth-user.dto';
+import { User, UserSchema } from './dto/auth-user.schema';
 import { JwtModule } from '@nestjs/jwt';
 
 @Module({
@@ -16,6 +16,6 @@ import { JwtModule } from '@nestjs/jwt';
       signOptions: { expiresIn: '1h' },
     }),
   ],
-  controllers: [AuthController]
+  controllers: [AuthController],
 })
 export class AuthModule {}

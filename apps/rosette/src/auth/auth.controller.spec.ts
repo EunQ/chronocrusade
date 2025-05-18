@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AuthController } from './auth.controller';
 import { JwtService } from '@nestjs/jwt';
 import { Model } from 'mongoose';
-import { UserDocument } from './dto/auth-user.dto';
+import { UserDocument } from './dto/auth-user.schema';
 
 describe('AuthController', () => {
   let controller: AuthController;

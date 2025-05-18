@@ -1,7 +1,7 @@
 import { Controller, UnauthorizedException } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { JwtService } from '@nestjs/jwt';
-import { User, UserDocument } from './dto/auth-user.dto';
+import { User, UserDocument } from './dto/auth-user.schema';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 

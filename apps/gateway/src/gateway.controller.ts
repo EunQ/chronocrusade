@@ -10,6 +10,7 @@ export class GatewayController {
   constructor(
     private readonly gatewayService: GatewayService,
     @Inject('ROSETTE_SERVICE') private readonly rosetteClient: ClientProxy,
+    @Inject('CHRONO_SERVICE') private readonly chronoClient: ClientProxy,
   ) {}
 
   @Get()
@@ -43,5 +44,13 @@ export class GatewayController {
     // return firstValueFrom(
     //   this.chronoClient.send('chrono/hello-b', { user })
     // );
+  }
+
+
+  @Get('/events')
+  //@UseGuards(RoleGuard)
+  //@Roles(['operator', 'admin'])
+  async findAllEvents(): Promise<Event> {
+    return firstValueFrom(this.chronoClient.send('/events', {}));
   }
 }

@@ -14,6 +14,14 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
           port: 8877,
         },
       },
+      {
+        name: 'CHRONO_SERVICE',
+        transport: Transport.TCP,
+        options: {
+          host: '127.0.0.1',
+          port: 8878,
+        },
+      },
     ]),
   ],
   controllers: [GatewayController],
