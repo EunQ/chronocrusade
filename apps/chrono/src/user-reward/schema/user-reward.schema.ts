@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-import { UserRewardItem } from '../types/user-reward.item';
 import { UserRewardStatus } from '../enum/user-reward.status';
+import { UserRewardLog } from './user-reward-log.schema';
 
 export type UserRewardDocument = UserReward & Document;
 
@@ -10,19 +10,14 @@ export class UserReward {
   @Prop({ required: true })
   userId: string;
 
-  @Prop({
-    type: [
-      {
-        type: { type: String, required: true },
-        id: { type: String, required: false, default: null },
-        count: { type: Number, required: true },
-        eventId: { type: String, required: false },
-        rewardId: { type: String, required: false },
-      },
-    ],
-    default: [],
-  })
-  rewards: UserRewardItem[];
+  @Prop({ required: true })
+  eventId: string;
+
+  @Prop({ required: true })
+  eventVersion: number;
+
+  @Prop({ required: true, type: Object })
+  dataSnapshot: Partial<UserRewardLog>; // 최신 기록 로그
 
   @Prop({
     required: true,
