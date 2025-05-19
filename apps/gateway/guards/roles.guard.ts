@@ -10,10 +10,11 @@ import {
 import { Reflector } from '@nestjs/core';
 import { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
+import { Role } from '../enums/roles.enum';
 
 // @Roles(...)
 export const ROLES_KEY = 'roles';
-export const Roles = (...roles: string[]) => SetMetadata(ROLES_KEY, roles);
+export const Roles = (...roles: Role[]) => SetMetadata(ROLES_KEY, roles);
 
 // @MatchUser(..._
 export const USER_MATCH_KEY = 'matchUser';
@@ -48,7 +49,7 @@ export class RoleGuard implements CanActivate {
     //req.userId = user.id;
 
     if (requiredRoles?.length) {
-      const hasRole = user.roles?.some((r: string) =>
+      const hasRole = user.roles?.some((r: Role) =>
         requiredRoles.includes(r),
       );
       if (!hasRole) throw new ForbiddenException('권한이 올바르지 않습니다.');

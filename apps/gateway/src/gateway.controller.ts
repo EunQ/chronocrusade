@@ -12,8 +12,7 @@ import {
 import { GatewayService } from './gateway.service';
 import { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
-import { RoleGuard } from '../guards/roles.guard';
-import { Roles } from '../enums/roles.enum';
+import { RoleGuard, Roles } from '../guards/roles.guard';
 import { GetEventListDto } from '../../../common/dto/get-event-list.dto';
 import { GetRewardListDto } from '../../../common/dto/get-reward-list.dto';
 import { CreateEventDto } from '../../../common/dto/create-event.dto';
@@ -22,6 +21,8 @@ import { CreateRewardDto } from '../../../common/dto/create-reward.dto';
 import { UpdateRewardDto } from '../../../common/dto/update-reward.dto';
 import { UserRewardRequest } from '../../../common/dto/user-reward.request';
 import { GetUserRewardLogDto } from '../../../common/dto/get-user-reward-log.dto';
+import { LoginUserDto } from '../../../common/dto/login-user.dto';
+import { Role } from '../enums/roles.enum';
 import Any = jasmine.Any;
 
 @Controller()
@@ -32,17 +33,18 @@ export class GatewayController {
     @Inject('CHRONO_SERVICE') private readonly chronoClient: ClientProxy,
   ) {}
 
-  @Get('/login')
-  async login(@Query('loginId') loginId: string): Promise<{ token: string }> {
+  @Post('/auth/login')
+  async login(@Body() body: LoginUserDto): Promise<{ token: string }> {
+    console.log(`/auth/login ${JSON.stringify(body)}`);
     const { token } = await firstValueFrom(
-      this.rosetteClient.send('auth/login', { loginId }),
+      this.rosetteClient.send('auth/login', body),
     );
     return { token };
   }
 
   @Get('/auth/verify')
   @UseGuards(RoleGuard)
-  @Roles('admin')
+  @Roles(Role.ADMIN)
   async helloB(@Req() req): Promise<string> {
     const user = req.user;
     console.log(user);
@@ -54,7 +56,7 @@ export class GatewayController {
 
   @Get('/events')
   @UseGuards(RoleGuard)
-  @Roles('operator', 'admin')
+  @Roles(Role.ADMIN, Role.OPERATOR)
   async findAllEvents2(@Query() params: GetEventListDto) {
     return firstValueFrom(this.chronoClient.send('get.events', params));
   }
