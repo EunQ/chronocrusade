@@ -52,7 +52,14 @@ export class UpdateRewardHandler
       existing.lastModifiedBy = lastModifiedBy;
 
       existing.version += 1;
-      return await existing.save();
+      const rReward = await existing.save();
+      return {
+        rewardId: rReward.rewardId,
+        eventId: rReward.eventId,
+        version: rReward.version,
+        lastModifiedBy: rReward.lastModifiedBy,
+        items: rReward.items,
+      };
     } finally {
       await this.lockService.releaseLock(Reward.name, rewardId);
     }

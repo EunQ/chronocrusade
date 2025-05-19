@@ -41,7 +41,15 @@ export class CreateRewardHandler
         lastModifiedBy: command.lastModifiedBy,
         version: 1,
       };
-      return await this.rewardModel.create(reward);
+      const rReward = await this.rewardModel.create(reward);
+
+      return {
+        rewardId: rReward.rewardId,
+        eventId: rReward.eventId,
+        version: rReward.version,
+        lastModifiedBy: rReward.lastModifiedBy,
+        items: rReward.items,
+      };
     } finally {
       await this.lockService.releaseLock(Reward.name, resourceId);
     }
