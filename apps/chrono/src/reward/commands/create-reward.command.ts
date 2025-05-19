@@ -1,12 +1,22 @@
 import { ICommand } from '@nestjs/cqrs';
-import { CouponReward } from '../schema/reward.schema';
+import { RewardItem } from '../types/reward-item.type';
 
 export class CreateRewardCommand implements ICommand {
-  constructor(
-    readonly coupons?: CouponReward[],
-    readonly gold?: number,
-    readonly exp?: number,
-    readonly eventIds?: string[],
-    readonly lastModifiedBy?: string,
-  ) {}
+  public readonly items: RewardItem[];
+  public readonly lastModifiedBy: string;
+  public readonly eventIds?: string[];
+
+  constructor({
+    items,
+    lastModifiedBy,
+    eventIds,
+  }: {
+    items: RewardItem[];
+    lastModifiedBy: string;
+    eventIds?: string[];
+  }) {
+    this.items = items;
+    this.lastModifiedBy = lastModifiedBy;
+    this.eventIds = eventIds;
+  }
 }

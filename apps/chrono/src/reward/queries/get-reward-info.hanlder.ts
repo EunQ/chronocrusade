@@ -22,6 +22,7 @@ export class GetRewardInfoQueryHandler
     const {
       rewardId,
       lastModifiedBy,
+      types,
       page = 1,
       limit = 10,
       sortBy = 'createdAt',
@@ -31,9 +32,15 @@ export class GetRewardInfoQueryHandler
     const filter: any = {};
     if (rewardId) filter.rewardId = rewardId;
     if (lastModifiedBy) filter.lastModifiedBy = lastModifiedBy;
+    if (types?.length) {
+      filter.items = { $elemMatch: { type: { $in: types } } };
+    }
 
     const skip = (page - 1) * limit;
-    const sort = { [sortBy]: sortOrder === 'asc' ? 1 : -1 } as Record<string, 1 | -1>;
+    const sort = { [sortBy]: sortOrder === 'asc' ? 1 : -1 } as Record<
+      string,
+      1 | -1
+    >;
 
     const [data, total] = await Promise.all([
       this.rewardModel.aggregate([

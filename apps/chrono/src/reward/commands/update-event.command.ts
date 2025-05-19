@@ -1,13 +1,26 @@
 import { ICommand } from '@nestjs/cqrs';
-import { CouponReward } from '../schema/reward.schema';
+import { RewardItem } from '../types/reward-item.type';
 
 export class UpdateRewardCommand implements ICommand {
-  constructor(
-    readonly rewardId: string, // 반드시 기준값 필요
-    readonly coupons?: CouponReward[],
-    readonly gold?: number,
-    readonly exp?: number,
-    readonly eventIds?: string[],
-    readonly lastModifiedBy?: string,
-  ) {}
+  public readonly rewardId: string;
+  public readonly lastModifiedBy: string;
+  public readonly items?: RewardItem[];
+  public readonly eventIds?: string[];
+
+  constructor({
+    rewardId,
+    lastModifiedBy,
+    items,
+    eventIds,
+  }: {
+    rewardId: string;
+    lastModifiedBy: string;
+    items?: RewardItem[];
+    eventIds?: string[];
+  }) {
+    this.rewardId = rewardId;
+    this.lastModifiedBy = lastModifiedBy;
+    this.items = items;
+    this.eventIds = eventIds;
+  }
 }

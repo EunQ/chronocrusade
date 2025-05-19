@@ -1,37 +1,16 @@
-import {
-  IsOptional,
-  IsArray,
-  IsNumber,
-  IsString,
-  ValidateNested,
-} from 'class-validator';
+import { IsArray, IsOptional, IsString, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
-
-class CouponDto {
-  @IsString()
-  id: string;
-
-  @IsNumber()
-  count: number;
-}
+import { RewardItemDto } from './reward-item.dto';
 
 export class UpdateRewardDto {
   @IsString()
-  rewardId: string; // 필수 (기준 ID)
+  rewardId: string;
 
   @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
-  @Type(() => CouponDto)
-  coupons?: CouponDto[];
-
-  @IsOptional()
-  @IsNumber()
-  gold?: number;
-
-  @IsOptional()
-  @IsNumber()
-  exp?: number;
+  @Type(() => RewardItemDto)
+  items?: RewardItemDto[];
 
   @IsOptional()
   @IsArray()

@@ -6,6 +6,7 @@ import { CreateRewardDto } from '../../../../common/dto/create-reward.dto';
 import { CreateRewardCommand } from './commands/create-reward.command';
 import { UpdateRewardDto } from '../../../../common/dto/update-reward.dto';
 import { UpdateRewardCommand } from './commands/update-event.command';
+import { json } from "express";
 
 @Injectable()
 export class RewardService {
@@ -15,38 +16,36 @@ export class RewardService {
   ) {}
 
   async getRewardList(dto: GetRewardListDto) {
-    const query = new GetRewardInfoQuery(
-      dto.rewardId,
-      dto.lastModifiedBy,
-      dto.page ?? 1,
-      dto.limit ?? 10,
-      dto.sortBy ?? 'createdAt',
-      dto.sortOrder ?? 'desc',
-    );
+    console.log(JSON.stringify(dto));
+
+    const query = new GetRewardInfoQuery({
+      rewardId: dto.rewardId,
+      types: dto.types,
+      page: dto.page ?? 1,
+      limit: dto.limit ?? 10,
+      sortBy: dto.sortBy ?? 'createdAt',
+      sortOrder: dto.sortOrder ?? 'desc',
+    });
 
     return this.queryBus.execute(query);
   }
 
   async createReward(dto: CreateRewardDto, lastModifiedBy: string) {
-    const command = new CreateRewardCommand(
-      dto.coupons,
-      dto.gold,
-      dto.exp,
-      dto.eventIds,
-      lastModifiedBy,
-    );
+    const command = new CreateRewardCommand({
+      items: dto.items,
+      eventIds: dto.eventIds,
+      lastModifiedBy: lastModifiedBy,
+    });
     return this.commandBus.execute(command);
   }
 
   async updateReward(dto: UpdateRewardDto, lastModifiedBy: string) {
-    const command = new UpdateRewardCommand(
-      dto.rewardId,
-      dto.coupons,
-      dto.gold,
-      dto.exp,
-      dto.eventIds,
-      lastModifiedBy,
-    );
+    const command = new UpdateRewardCommand({
+      rewardId: dto.rewardId,
+      items: dto.items,
+      eventIds: dto.eventIds,
+      lastModifiedBy: lastModifiedBy,
+    });
     return this.commandBus.execute(command);
   }
 }

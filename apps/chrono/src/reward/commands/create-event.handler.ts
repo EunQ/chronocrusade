@@ -6,7 +6,6 @@ import { Reward, RewardDocument } from '../schema/reward.schema';
 import { generateRewardId } from '../../../../../utils/id-gen';
 import { ConflictException, Injectable } from '@nestjs/common';
 import { LockService } from '../../../../../common/lock/lock.service';
-import { GameEvent } from '../../event/schema/event.schema';
 
 @Injectable()
 @CommandHandler(CreateRewardCommand)
@@ -20,8 +19,6 @@ export class CreateRewardHandler
   ) {}
 
   async execute(command: CreateRewardCommand): Promise<Reward> {
-    const { coupons, gold, exp, eventIds, lastModifiedBy } = command;
-
     const rewardId = generateRewardId();
     const resourceId = rewardId; // 혹은 eventId 또는 유니크 키
 
@@ -39,13 +36,11 @@ export class CreateRewardHandler
 
     try {
       const reward: Partial<Reward> = {
-        rewardId,
-        coupons,
-        gold,
-        exp,
-        eventIds: eventIds ?? [],
+        rewardId: rewardId,
+        items: command.items,
+        eventIds: command.eventIds,
+        lastModifiedBy: command.lastModifiedBy,
         version: 1,
-        lastModifiedBy,
       };
       return await this.rewardModel.create(reward);
     } finally {

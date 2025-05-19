@@ -1,21 +1,31 @@
 const rewards = [
   {
     rewardId: 'RWD-202405191800-A1Xb7',
-    gold: 100,
-    exp: 50,
-    eventIds: [], // 이후 이벤트에서 참조됨
+    items: [
+      { type: 'gold', id: 'GOLD', count: 100 },
+      { type: 'exp', id: 'EXP', count: 50 },
+    ],
+    eventIds: [],
+    version: 1,
+    lastModifiedBy: 'admin1',
   },
   {
     rewardId: 'RWD-202405191800-Fz92L',
-    coupons: [{ id: 'WELCOME10', count: 1 }],
+    items: [{ type: 'coupon', id: 'WELCOME10', count: 1 }],
     eventIds: [],
+    version: 1,
+    lastModifiedBy: 'admin1',
   },
   {
     rewardId: 'RWD-202405191800-ZzE91',
-    gold: 200,
-    exp: 100,
-    coupons: [{ id: 'BOSS50', count: 2 }],
+    items: [
+      { type: 'gold', id: 'GOLD', count: 200 },
+      { type: 'exp', id: 'EXP', count: 100 },
+      { type: 'coupon', id: 'BOSS50', count: 2 },
+    ],
     eventIds: [],
+    version: 1,
+    lastModifiedBy: 'admin1',
   },
 ];
 

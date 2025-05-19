@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { ChronoModule } from './chrono.module';
+import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(
@@ -12,6 +13,11 @@ async function bootstrap() {
         port: +(process.env.CHRONO_PORT ?? '8878'), // Rosette와 다른 포트
       },
     },
+  );
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+    }),
   );
   await app.listen();
 }

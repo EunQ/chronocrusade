@@ -69,6 +69,7 @@ export class GatewayController {
 
   @Get('/rewards')
   async findAllReward(@Query() params: GetRewardListDto): Promise<Any> {
+    console.log(JSON.stringify(params));
     return firstValueFrom(this.chronoClient.send('get.rewards', params));
   }
 

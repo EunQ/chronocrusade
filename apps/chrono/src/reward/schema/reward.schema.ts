@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import { generateRewardId } from '../../../../../utils/id-gen';
+import { RewardItem } from "../types/reward-item.type";
 
 export class CouponReward {
   @Prop({ required: true })
@@ -15,14 +16,18 @@ export class Reward {
   @Prop({ required: true, unique: true })
   rewardId: string;
 
-  @Prop({ type: [CouponReward], default: [] })
-  coupons?: CouponReward[];
-
-  @Prop()
-  gold?: number;
-
-  @Prop()
-  exp?: number;
+  @Prop({
+    type: [
+      {
+        type: { type: String, required: true },
+        id: { type: String, default: null },
+        count: { type: Number, required: true },
+        meta: { type: Object, default: {} },
+      },
+    ],
+    default: [],
+  })
+  items: RewardItem[];
 
   @Prop({ type: [String], default: [] })
   eventIds: string[];

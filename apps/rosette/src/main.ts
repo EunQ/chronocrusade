@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { RosetteModule } from './rosette.module';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
-import { AuthModule } from './auth/auth.module';
+import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(
@@ -13,6 +13,11 @@ async function bootstrap() {
         port: +(process.env.port ?? '8877'),
       },
     },
+  );
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+    }),
   );
   await app.listen();
 }
