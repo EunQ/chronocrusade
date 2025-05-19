@@ -1,9 +1,8 @@
 import { IQuery } from '@nestjs/cqrs';
 
-export class GetEventInfoQuery implements IQuery {
+export class GetRewardInfoQuery implements IQuery {
   constructor(
-    public readonly eventId?: string,
-    public readonly isActive?: boolean,
+    public readonly rewardId?: string,
     public readonly lastModifiedBy?: string,
 
     public readonly page: number = 1,

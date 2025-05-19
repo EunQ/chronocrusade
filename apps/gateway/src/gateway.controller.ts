@@ -1,9 +1,13 @@
-import { Controller, Get, Inject, Param, Post, Query, Req, UseGuards } from '@nestjs/common';
+import { Controller, Get, Inject, Query, Req, UseGuards } from '@nestjs/common';
 import { GatewayService } from './gateway.service';
 import { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
 import { RoleGuard } from '../guards/roles.guard';
 import { Roles } from '../roles/roles.decorator';
+import { GameEvent } from '../../chrono/src/event/schema/event.schema';
+import Any = jasmine.Any;
+import { GetEventListDto } from '../../chrono/src/event/dto/get-event-list.dto';
+import { GetRewardListDto } from '../../chrono/src/reward/dto/get-reward-list.dto';
 
 @Controller()
 export class GatewayController {
@@ -46,18 +50,22 @@ export class GatewayController {
     // );
   }
 
-
   @Get('/events')
   //@UseGuards(RoleGuard)
   //@Roles(['operator', 'admin'])
-  async findAllEvents(): Promise<Event> {
+  async findAllEvents(): Promise<GameEvent> {
     return firstValueFrom(this.chronoClient.send('/events', {}));
   }
 
   @Get('/events2')
   //@UseGuards(RoleGuard)
   //@Roles(['operator', 'admin'])
-  async findAllEvents2(): Promise<Event> {
-    return firstValueFrom(this.chronoClient.send('/events2', {}));
+  async findAllEvents2(@Query() params: GetEventListDto) {
+    return firstValueFrom(this.chronoClient.send('/events2', params));
+  }
+
+  @Get('/rewards')
+  async findAllReward(@Query() params: GetRewardListDto): Promise<Any> {
+    return firstValueFrom(this.chronoClient.send('/rewards', params));
   }
 }

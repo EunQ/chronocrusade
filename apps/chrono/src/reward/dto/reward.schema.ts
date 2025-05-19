@@ -15,9 +15,6 @@ export class Reward {
   @Prop({ required: true, unique: true })
   rewardId: string;
 
-  @Prop({ required: true })
-  type: string;
-
   @Prop({ type: [CouponReward], default: [] })
   coupons?: CouponReward[];
 
@@ -29,6 +26,12 @@ export class Reward {
 
   @Prop({ type: [String], default: [] })
   eventIds: string[];
+
+  @Prop({ default: 1 })
+  version: number;
+
+  @Prop()
+  lastModifiedBy: string;
 }
 
 export type RewardDocument = Reward & Document;

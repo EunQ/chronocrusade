@@ -4,7 +4,7 @@ import { Model } from 'mongoose';
 import { EventDocument, GameEvent } from './schema/event.schema';
 import { QueryBus } from '@nestjs/cqrs';
 import { GetEventInfoQuery } from './queries/get-event-info.query';
-import { GetEventListDto } from './event.controller';
+import { GetEventListDto } from './dto/get-event-list.dto';
 
 @Injectable()
 export class EventService {
