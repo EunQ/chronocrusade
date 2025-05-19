@@ -222,7 +222,7 @@ npm run start:dev
 처음에는 **N\:M 관계**로 설계하려 했지만, 향후 데이터가 많아지면 관리가 여러울점을 고려해 **1:1 관계**로 단순화 <br/>
 `Reward`는 MongoDB의 수정에 자유로운 특징을 활용해 어떤 보상이 오더라도 추가되게 셜계함.
 
-``` JSON
+```ts
 //Reward 컬렉션에 있는 컬럼 중 하나인 RewardItem
 export type RewardItem = {
   type: string; // ex: gold, exp, coupon, item, etc.
