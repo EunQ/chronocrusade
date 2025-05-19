@@ -10,11 +10,11 @@ export class UserRewardController {
 
   @MessagePattern('request.userReward')
   async requestUserReward(@Payload() dto: UserRewardRequest) {
-    return this.userRewardService.requestUserReward(dto, 'user1');
+    return this.userRewardService.requestUserReward(dto, dto.userId);
   }
 
   @MessagePattern('get.userRewardLogs')
   async getUserRewardLogs(@Payload() dto: GetUserRewardLogDto) {
-    return this.userRewardService.getUserRewardLogs(dto, 'user1');
+    return this.userRewardService.getUserRewardLogs(dto, dto.userId);
   }
 }

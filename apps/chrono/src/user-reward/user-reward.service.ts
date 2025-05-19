@@ -22,7 +22,7 @@ export class UserRewardService {
     return this.commandBus.execute(command);
   }
 
-  getUserRewardLogs(dto: GetUserRewardLogDto, userId: string) {
+  getUserRewardLogs(dto: GetUserRewardLogDto, userId?: string) {
     const query = new GetUserRewardLogQuery({
       userId: userId,
       eventId: dto.eventId,

@@ -190,6 +190,7 @@ export class GatewayController {
   보상 요청
    */
   @Post('/user/reward')
+  @UseGuards(RoleGuard)
   @MatchUser(true)
   @Roles(Role.USER)
   async requestUserReward(@Body() body: UserRewardRequest) {
@@ -204,6 +205,7 @@ export class GatewayController {
   }
 
   @Get('/user/reward/logs')
+  @UseGuards(RoleGuard)
   @Roles(Role.ADMIN, Role.OPERATOR, Role.AUDITOR, Role.USER)
   async getUserRewardLogs(@Query() params: GetUserRewardLogDto, @Req() req) {
     const { roles, id: currentUserId } = req.user;
@@ -211,7 +213,7 @@ export class GatewayController {
     if (isUserOnly) {
       if (!params.userId || currentUserId !== params.userId) {
         throw new ForbiddenException(
-          'USER 권한은 userId 파라미터가 필수입니다.',
+          'USER 권한은 userId 올바른 파라미터가 필수입니다.',
         );
       }
     }
