@@ -6,7 +6,6 @@ import {
   Post,
   Put,
   Query,
-  Req,
   UseGuards,
 } from '@nestjs/common';
 import { GatewayService } from './gateway.service';
@@ -23,6 +22,8 @@ import { UserRewardRequest } from '../../../common/dto/user-reward.request';
 import { GetUserRewardLogDto } from '../../../common/dto/get-user-reward-log.dto';
 import { LoginUserDto } from '../../../common/dto/login-user.dto';
 import { Role } from '../enums/roles.enum';
+import { CreateUserDto } from '../../../common/dto/create-user.dto';
+import { UpdateUserDto } from '../../../common/dto/update-user.dto';
 import Any = jasmine.Any;
 
 @Controller()
@@ -35,23 +36,25 @@ export class GatewayController {
 
   @Post('/auth/login')
   async login(@Body() body: LoginUserDto): Promise<{ token: string }> {
-    console.log(`/auth/login ${JSON.stringify(body)}`);
     const { token } = await firstValueFrom(
       this.rosetteClient.send('auth/login', body),
     );
     return { token };
   }
 
-  @Get('/auth/verify')
+  @Post('/user/signin')
   @UseGuards(RoleGuard)
   @Roles(Role.ADMIN)
-  async helloB(@Req() req): Promise<string> {
-    const user = req.user;
-    console.log(user);
-    return 'test';
-    // return firstValueFrom(
-    //   this.chronoClient.send('chrono/hello-b', { user })
-    // );
+  async signin(@Body() body: CreateUserDto) {
+    return await firstValueFrom(this.rosetteClient.send('sigin.user', body));
+  }
+
+  @Post('/user')
+  @UseGuards(RoleGuard)
+  @Roles(Role.ADMIN)
+  async updateUser(@Body() body: UpdateUserDto) {
+    //Update할때는 admin 유저인경우, 패스워드로부터 자유로움.
+    return await firstValueFrom(this.rosetteClient.send('update.user', body));
   }
 
   @Get('/events')
