@@ -18,9 +18,10 @@ import { GetEventListDto } from '../../../common/dto/get-event-list.dto';
 import { GetRewardListDto } from '../../../common/dto/get-reward-list.dto';
 import { CreateEventDto } from '../../../common/dto/create-event.dto';
 import { UpdateEventDto } from '../../../common/dto/update-event.dto';
-import Any = jasmine.Any;
 import { CreateRewardDto } from '../../../common/dto/create-reward.dto';
 import { UpdateRewardDto } from '../../../common/dto/update-reward.dto';
+import { UserRewardRequest } from '../../../common/dto/user-reward.request';
+import Any = jasmine.Any;
 
 @Controller()
 export class GatewayController {
@@ -81,5 +82,10 @@ export class GatewayController {
   @Put('/reward')
   async updateReward(@Body() body: UpdateRewardDto): Promise<Any> {
     return firstValueFrom(this.chronoClient.send('update.reward', body));
+  }
+
+  @Post('request.userReward')
+  async requestUserReward(@Body() body: UserRewardRequest) {
+    return firstValueFrom(this.chronoClient.send('request.userReward', body));
   }
 }

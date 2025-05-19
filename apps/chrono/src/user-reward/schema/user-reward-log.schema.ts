@@ -36,6 +36,7 @@ export class UserRewardLog {
   @Prop({
     required: true,
     enum: UserRewardStatus,
+    type: String,
     default: UserRewardStatus.PENDING,
   })
   status: UserRewardStatus;

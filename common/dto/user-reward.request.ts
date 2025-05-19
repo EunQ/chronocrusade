@@ -1,13 +1,9 @@
-import { EventCondition } from '../../apps/chrono/src/event/types/event-condition.type';
+import { EvaluationItem } from '../../apps/chrono/src/user-reward/types/evaluationItem';
 
 export class UserRewardRequest {
   constructor(
-    readonly name: string,
-    readonly description: string,
-    readonly conditions: EventCondition[],
-    readonly rewardIds: string[],
-    readonly startDate: Date,
-    readonly endDate: Date,
-    readonly isActive: boolean,
+    readonly eventId: string,
+    readonly eventVersion: number,
+    readonly evaluations: EvaluationItem[],
   ) {}
 }

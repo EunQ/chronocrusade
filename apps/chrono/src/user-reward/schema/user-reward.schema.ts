@@ -17,11 +17,12 @@ export class UserReward {
   eventVersion: number;
 
   @Prop({ required: true, type: Object })
-  dataSnapshot: Partial<UserRewardLog>; // 최신 기록 로그
+  logSnapshot: Partial<UserRewardLog>; // 최신 기록 로그
 
   @Prop({
     required: true,
     enum: UserRewardStatus,
+    type: String,
     default: UserRewardStatus.PENDING,
   })
   status: UserRewardStatus;
