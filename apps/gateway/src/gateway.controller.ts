@@ -25,6 +25,7 @@ import { Role } from '../enums/roles.enum';
 import { CreateUserDto } from '../../../common/dto/create-user.dto';
 import { UpdateUserDto } from '../../../common/dto/update-user.dto';
 import Any = jasmine.Any;
+import { AdminUpdateUserDto } from '../../../common/dto/admin-update-user.dto';
 
 @Controller()
 export class GatewayController {
@@ -52,16 +53,18 @@ export class GatewayController {
     return await firstValueFrom(this.rosetteClient.send('update.user', body));
   }
 
-  @Post('/user')
+  @Post('/admin/user')
   @Roles(Role.ADMIN)
-  async adminUpdateUser(@Body() body: UpdateUserDto) {
-    return await firstValueFrom(this.rosetteClient.send('update.user', body));
+  async adminUpdateUser(@Body() body: AdminUpdateUserDto) {
+    return await firstValueFrom(
+      this.rosetteClient.send('admin.update.user', body),
+    );
   }
 
   @Get('/events')
   @UseGuards(RoleGuard)
   @Roles(Role.ADMIN, Role.OPERATOR)
-  async findAllEvents2(@Query() params: GetEventListDto) {
+  async getEvents(@Query() params: GetEventListDto) {
     return firstValueFrom(this.chronoClient.send('get.events', params));
   }
 

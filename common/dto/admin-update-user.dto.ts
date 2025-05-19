@@ -1,8 +1,7 @@
 import { Role } from '../../apps/gateway/enums/roles.enum';
 
-export class UpdateUserDto {
+export class AdminUpdateUserDto {
   loginId: string;
-  password: string;
-  newPassword?: string;
+  password?: string;
   roles?: Role[];
 }
