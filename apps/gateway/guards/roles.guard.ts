@@ -4,12 +4,20 @@ import {
   ForbiddenException,
   Inject,
   Injectable,
+  SetMetadata,
   UnauthorizedException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
-import { ROLES_KEY } from '../roles/roles.decorator';
+
+// @Roles(...)
+export const ROLES_KEY = 'roles';
+export const Roles = (...roles: string[]) => SetMetadata(ROLES_KEY, roles);
+
+// @MatchUser(..._
+export const USER_MATCH_KEY = 'matchUser';
+export const MatchUser = () => SetMetadata(USER_MATCH_KEY, true);
 
 @Injectable()
 export class RoleGuard implements CanActivate {
@@ -19,10 +27,16 @@ export class RoleGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const requiredRoles = this.reflector.get<string[]>(
+    const requiredRoles = this.reflector.getAllAndOverride<string[]>(
       ROLES_KEY,
-      context.getHandler(),
+      [context.getHandler(), context.getClass()],
     );
+
+    const matchUser = this.reflector.getAllAndOverride<boolean>(
+      USER_MATCH_KEY,
+      [context.getHandler(), context.getClass()],
+    );
+
     const req = context.switchToHttp().getRequest();
     const token = req.headers['authorization'];
     if (!token) throw new UnauthorizedException();
@@ -30,11 +44,23 @@ export class RoleGuard implements CanActivate {
     const user = await firstValueFrom(
       this.rosetteClient.send('auth/verify', { token }),
     );
-    req.user = user;
 
-    const hasRole = user.roles?.some((r: string) => requiredRoles.includes(r));
-    if (!hasRole) throw new ForbiddenException('권한이 올바르지 않습니다.');
+    //req.userId = user.id;
 
+    if (requiredRoles?.length) {
+      const hasRole = user.roles?.some((r: string) =>
+        requiredRoles.includes(r),
+      );
+      if (!hasRole) throw new ForbiddenException('권한이 올바르지 않습니다.');
+    }
+
+    if (matchUser) {
+      const paramUserId =
+        req.params?.userId || req.body?.userId || req.query?.userId;
+      if (!paramUserId || paramUserId !== user.id) {
+        throw new ForbiddenException('사용자 정보가 일치하지 않습니다.');
+      }
+    }
     return true;
   }
 }

@@ -13,7 +13,7 @@ import { GatewayService } from './gateway.service';
 import { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
 import { RoleGuard } from '../guards/roles.guard';
-import { Roles } from '../roles/roles.decorator';
+import { Roles } from '../enums/roles.enum';
 import { GetEventListDto } from '../../../common/dto/get-event-list.dto';
 import { GetRewardListDto } from '../../../common/dto/get-reward-list.dto';
 import { CreateEventDto } from '../../../common/dto/create-event.dto';
@@ -53,8 +53,8 @@ export class GatewayController {
   }
 
   @Get('/events')
-  //@UseGuards(RoleGuard)
-  //@Roles(['operator', 'admin'])
+  @UseGuards(RoleGuard)
+  @Roles('operator', 'admin')
   async findAllEvents2(@Query() params: GetEventListDto) {
     return firstValueFrom(this.chronoClient.send('get.events', params));
   }
