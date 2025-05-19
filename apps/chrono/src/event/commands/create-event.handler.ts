@@ -54,7 +54,20 @@ export class CreateEventHandler implements ICommandHandler<CreateEventCommand> {
         lastModifiedBy,
       };
 
-      return await this.eventModel.create(eventData);
+      const rEvent = await this.eventModel.create(eventData);
+
+      return {
+        eventId: rEvent.eventId,
+        name: rEvent.name,
+        description: rEvent.description,
+        conditions: rEvent.conditions,
+        rewardIds: rEvent.rewardIds,
+        startDate: rEvent.startDate,
+        endDate: rEvent.endDate,
+        isActive: rEvent.isActive,
+        version: rEvent.version,
+        lastModifiedBy: rEvent.lastModifiedBy,
+      };
     } finally {
       await this.lockService.releaseLock(GameEvent.name, resourceId);
     }

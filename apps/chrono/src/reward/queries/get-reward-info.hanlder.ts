@@ -50,26 +50,33 @@ export class GetRewardInfoQueryHandler
         {
           $lookup: {
             from: 'events',
-            localField: 'eventIds',
+            localField: 'eventId', // 단일 eventId
             foreignField: 'eventId',
-            as: 'events',
+            as: 'event',
           },
         },
         {
-          $addFields: {
-            events: {
-              $map: {
-                input: '$events',
-                as: 'event',
-                in: {
-                  eventId: '$$event.eventId',
-                  name: '$$event.name',
-                  description: '$$event.description',
-                  isActive: '$$event.isActive',
-                  startDate: '$$event.startDate',
-                  endDate: '$$event.endDate',
-                },
-              },
+          $unwind: {
+            path: '$event',
+            preserveNullAndEmptyArrays: true,
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            rewardId: 1,
+            items: 1,
+            version: 1,
+            lastModifiedBy: 1,
+            createdAt: 1,
+            updatedAt: 1,
+            event: {
+              eventId: '$event.eventId',
+              name: '$event.name',
+              description: '$event.description',
+              isActive: '$event.isActive',
+              startDate: '$event.startDate',
+              endDate: '$event.endDate',
             },
           },
         },

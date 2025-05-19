@@ -67,7 +67,20 @@ export class UpdateEventHandler implements ICommandHandler<UpdateEventCommand> {
         existingEvent.lastModifiedBy = lastModifiedBy;
 
       existingEvent.version += 1; // 수동 버전 증가
-      return await existingEvent.save();
+      const rEvent = await existingEvent.save();
+
+      return {
+        eventId: rEvent.eventId,
+        name: rEvent.name,
+        description: rEvent.description,
+        conditions: rEvent.conditions,
+        rewardIds: rEvent.rewardIds,
+        startDate: rEvent.startDate,
+        endDate: rEvent.endDate,
+        isActive: rEvent.isActive,
+        version: rEvent.version,
+        lastModifiedBy: rEvent.lastModifiedBy,
+      };
     } finally {
       await this.lockService.releaseLock(GameEvent.name, eventId);
     }
