@@ -25,6 +25,7 @@ export class EventService {
       dto.sortOrder ?? 'desc',
     );
 
+    console.log(JSON.stringify(query));
     return this.queryBus.execute(query);
   }
 

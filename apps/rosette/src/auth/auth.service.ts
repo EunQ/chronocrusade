@@ -1,8 +1,3 @@
-import {
-  ConflictException,
-  NotFoundException,
-  UnauthorizedException,
-} from '@nestjs/common';
 import { Payload, RpcException } from '@nestjs/microservices';
 import { JwtService } from '@nestjs/jwt';
 import { User, UserDocument } from './dto/auth-user.schema';
@@ -26,6 +21,11 @@ export class AuthService {
   async handleLogin(@Payload() data: LoginUserDto) {
     const user = await this.userModel.findOne({ id: data.loginId }).exec();
     if (!user) {
+      throw new RpcException('사용자를 찾을 수 없습니다.');
+    }
+
+    //저장되어 있는 패스워드가 없지만, Param이 온 경우.
+    if (data.password && !user.encPassword) {
       throw new RpcException('사용자를 찾을 수 없습니다.');
     }
 
@@ -60,7 +60,11 @@ export class AuthService {
         roles: dto.roles,
       });
 
-      return user.save();
+      const rUser = await user.save();
+      return {
+        id: rUser.id,
+        roles: rUser.roles,
+      };
     } finally {
       await this.lockService.releaseLock(User.name, dto.loginId);
     }
@@ -69,9 +73,7 @@ export class AuthService {
   async updateUser(dto: UpdateUserDto) {
     const locked = this.lockService.acquireLock(User.name, dto.loginId, 10);
     if (!locked) {
-      throw new RpcException(
-        `유저 '${dto.loginId}'는 현재 수정 중입니다.`,
-      );
+      throw new RpcException(`유저 '${dto.loginId}'는 현재 수정 중입니다.`);
     }
 
     try {
@@ -93,7 +95,11 @@ export class AuthService {
         user.roles = dto.roles;
       }
 
-      return user.save();
+      const rUser = await user.save();
+      return {
+        id: rUser.id,
+        roles: rUser.roles,
+      };
     } finally {
       await this.lockService.releaseLock(User.name, dto.loginId);
     }
@@ -102,9 +108,7 @@ export class AuthService {
   async adminUpdateUser(dto: AdminUpdateUserDto) {
     const locked = this.lockService.acquireLock(User.name, dto.loginId, 10);
     if (!locked) {
-      throw new RpcException(
-        `유저 '${dto.loginId}'는 현재 수정 중입니다.`,
-      );
+      throw new RpcException(`유저 '${dto.loginId}'는 현재 수정 중입니다.`);
     }
 
     try {
@@ -118,7 +122,11 @@ export class AuthService {
         user.roles = dto.roles;
       }
 
-      return user.save();
+      const rUser = await user.save();
+      return {
+        id: rUser.id,
+        roles: rUser.roles,
+      };
     } finally {
       await this.lockService.releaseLock(User.name, dto.loginId);
     }

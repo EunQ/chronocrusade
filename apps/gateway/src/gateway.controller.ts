@@ -76,6 +76,7 @@ export class GatewayController {
   }
 
   @Post('/admin/user')
+  @UseGuards(RoleGuard)
   @Roles(Role.ADMIN)
   async adminUpdateUser(@Body() body: AdminUpdateUserDto) {
     return await firstValueFrom(

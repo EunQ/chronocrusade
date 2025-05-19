@@ -52,6 +52,36 @@ export class GetEventInfoQueryHandler
             as: 'rewards',
           },
         },
+        {
+          $addFields: {
+            rewards: {
+              $map: {
+                input: '$rewards',
+                as: 'reward',
+                in: {
+                  rewardId: '$$reward.rewardId',
+                  items: '$$reward.items',
+                },
+              },
+            },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            eventId: 1,
+            name: 1,
+            description: 1,
+            startDate: 1,
+            endDate: 1,
+            isActive: 1,
+            version: 1,
+            lastModifiedBy: 1,
+            createdAt: 1,
+            updatedAt: 1,
+            rewards: 1, // 위에서 가공한 rewards
+          },
+        },
         { $sort: sort },
         { $skip: skip },
         { $limit: limit },
