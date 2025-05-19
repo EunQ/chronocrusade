@@ -13,20 +13,28 @@ import {
   UserRewardLogSchema,
 } from './schema/user-reward-log.schema';
 import { GetUserRewardLogHandler } from './queries/get-user-reward-log.handler';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
     CqrsModule,
     LockModule,
-    MongooseModule.forRoot(
-      'mongodb://root:1234@localhost:27017/game?authSource=admin',
-    ),
-    MongooseModule.forRoot(
-      'mongodb://root:1234@localhost:27017/log?authSource=admin',
-      {
+    MongooseModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async (config: ConfigService) => ({
+        uri: config.get<string>('MONGODB_GAME_URI'),
+      }),
+      inject: [ConfigService],
+    }),
+    MongooseModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async (config: ConfigService) => ({
+        uri: config.get<string>('MONGODB_LOG_URI'),
         connectionName: 'LOG',
-      },
-    ),
+      }),
+      inject: [ConfigService],
+    }),
+
     MongooseModule.forFeature([
       { name: UserReward.name, schema: UserRewardSchema },
     ]),
