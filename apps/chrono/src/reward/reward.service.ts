@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { GetRewardListDto } from './dto/get-reward-list.dto';
+import { GetRewardListDto } from '../../../../common/dto/get-reward-list.dto';
 import { QueryBus } from '@nestjs/cqrs';
 import { GetRewardInfoQuery } from './queries/get-reward-info.query';
 

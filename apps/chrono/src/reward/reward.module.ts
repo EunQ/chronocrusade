@@ -5,7 +5,7 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { GetRewardInfoQueryHandler } from './queries/get-reward-info.hanlder';
 import { MongooseModule } from '@nestjs/mongoose';
 import { EventSchema, GameEvent } from '../event/schema/event.schema';
-import { Reward, RewardSchema } from './dto/reward.schema';
+import { Reward, RewardSchema } from './schema/reward.schema';
 
 @Module({
   imports: [CqrsModule,

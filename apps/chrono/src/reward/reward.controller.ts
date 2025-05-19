@@ -1,7 +1,7 @@
 import { Controller } from '@nestjs/common';
 import { RewardService } from './reward.service';
 import { MessagePattern, Payload } from '@nestjs/microservices';
-import { GetEventListDto } from '../event/dto/get-event-list.dto';
+import { GetEventListDto } from '../../../../common/dto/get-event-list.dto';
 
 @Controller()
 export class RewardController {

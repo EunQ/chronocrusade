@@ -1,26 +1,18 @@
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { EventDocument, GameEvent } from './schema/event.schema';
-import { QueryBus } from '@nestjs/cqrs';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { GetEventInfoQuery } from './queries/get-event-info.query';
-import { GetEventListDto } from './dto/get-event-list.dto';
+import { GetEventListDto } from '../../../../common/dto/get-event-list.dto';
+import { CreateEventDto } from '../../../../common/dto/create-event.dto';
+import { CreateEventCommand } from './commands/create-event.command';
 
 @Injectable()
 export class EventService {
   constructor(
-    @InjectModel(GameEvent.name)
-    private readonly eventModel: Model<EventDocument>,
-
+    private readonly commandBus: CommandBus,
     private readonly queryBus: QueryBus,
   ) {}
 
-  async findAll(): Promise<GameEvent[]> {
-    return this.eventModel.find().lean().exec();
-  }
-
   async getEventList(dto: GetEventListDto) {
-    console.log(`getEventList ${dto}`);
     const query = new GetEventInfoQuery(
       dto.eventId,
       dto.isActive,
@@ -32,5 +24,20 @@ export class EventService {
     );
 
     return this.queryBus.execute(query);
+  }
+
+  async createEventList(dto: CreateEventDto, lastModifiedBy: string) {
+    const command = new CreateEventCommand(
+      dto.name,
+      dto.description,
+      dto.conditions,
+      dto.rewardIds,
+      dto.startDate,
+      dto.endDate,
+      dto.isActive,
+      lastModifiedBy,
+    );
+
+    return this.commandBus.execute(command);
   }
 }

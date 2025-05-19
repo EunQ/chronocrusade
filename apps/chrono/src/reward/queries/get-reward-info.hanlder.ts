@@ -2,7 +2,7 @@ import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { GetRewardInfoQuery } from './get-reward-info.query';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Reward, RewardDocument } from '../dto/reward.schema';
+import { Reward, RewardDocument } from '../schema/reward.schema';
 
 @QueryHandler(GetRewardInfoQuery)
 export class GetRewardInfoQueryHandler

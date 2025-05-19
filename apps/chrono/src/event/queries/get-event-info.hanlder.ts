@@ -9,7 +9,7 @@ export class GetEventInfoQueryHandler
   implements IQueryHandler<GetEventInfoQuery>
 {
   constructor(
-    @InjectModel(GameEvent.name)
+    @InjectModel(GameEvent.name, 'EVENT')
     private readonly eventModel: Model<EventDocument>,
   ) {}
 
