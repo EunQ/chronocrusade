@@ -6,7 +6,6 @@ import { CreateRewardDto } from '../../../../common/dto/create-reward.dto';
 import { CreateRewardCommand } from './commands/create-reward.command';
 import { UpdateRewardDto } from '../../../../common/dto/update-reward.dto';
 import { UpdateRewardCommand } from './commands/update-event.command';
-import { json } from "express";
 
 @Injectable()
 export class RewardService {
@@ -16,11 +15,11 @@ export class RewardService {
   ) {}
 
   async getRewardList(dto: GetRewardListDto) {
-    console.log(JSON.stringify(dto));
-
     const query = new GetRewardInfoQuery({
       rewardId: dto.rewardId,
+      lastModifiedBy: dto.lastModifiedBy,
       types: dto.types,
+      eventId: dto.eventId,
       page: dto.page ?? 1,
       limit: dto.limit ?? 10,
       sortBy: dto.sortBy ?? 'createdAt',
@@ -33,7 +32,7 @@ export class RewardService {
   async createReward(dto: CreateRewardDto, lastModifiedBy: string) {
     const command = new CreateRewardCommand({
       items: dto.items,
-      eventIds: dto.eventIds,
+      eventId: dto.eventId,
       lastModifiedBy: lastModifiedBy,
     });
     return this.commandBus.execute(command);
@@ -43,7 +42,7 @@ export class RewardService {
     const command = new UpdateRewardCommand({
       rewardId: dto.rewardId,
       items: dto.items,
-      eventIds: dto.eventIds,
+      eventId: dto.eventId,
       lastModifiedBy: lastModifiedBy,
     });
     return this.commandBus.execute(command);

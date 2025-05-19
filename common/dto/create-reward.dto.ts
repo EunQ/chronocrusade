@@ -1,15 +1,12 @@
 import { IsArray, IsOptional, IsString, ValidateNested } from 'class-validator';
-import { Type } from 'class-transformer';
-import { RewardItemDto } from './reward-item.dto';
+import { RewardItem } from '../../apps/chrono/src/reward/types/reward-item.type';
 
 export class CreateRewardDto {
   @IsArray()
   @ValidateNested({ each: true })
-  @Type(() => RewardItemDto)
-  items: RewardItemDto[];
+  items: RewardItem[];
 
   @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
-  eventIds?: string[];
+  @IsString()
+  eventId?: string;
 }

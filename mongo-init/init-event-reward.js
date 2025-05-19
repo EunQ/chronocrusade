@@ -5,14 +5,12 @@ const rewards = [
       { type: 'gold', id: 'GOLD', count: 100 },
       { type: 'exp', id: 'EXP', count: 50 },
     ],
-    eventIds: [],
     version: 1,
     lastModifiedBy: 'admin1',
   },
   {
     rewardId: 'RWD-202405191800-Fz92L',
     items: [{ type: 'coupon', id: 'WELCOME10', count: 1 }],
-    eventIds: [],
     version: 1,
     lastModifiedBy: 'admin1',
   },
@@ -23,7 +21,6 @@ const rewards = [
       { type: 'exp', id: 'EXP', count: 100 },
       { type: 'coupon', id: 'BOSS50', count: 2 },
     ],
-    eventIds: [],
     version: 1,
     lastModifiedBy: 'admin1',
   },
@@ -95,9 +92,9 @@ const events = [
   },
 ];
 
-rewards[0].eventIds = ['EVT-202405191800-kPd8M', 'EVT-202405191800-UyW3d'];
-rewards[1].eventIds = ['EVT-202405191800-Pc3aD', 'EVT-202405191800-XzWq7'];
-rewards[2].eventIds = ['EVT-202405191800-dA9Lk', 'EVT-202405191800-XzWq7'];
+rewards[0].eventId = 'EVT-202405191800-kPd8M';
+rewards[1].eventId = 'EVT-202405191800-Pc3aD';
+rewards[2].eventId = 'EVT-202405191800-dA9Lk';
 
 const now = new Date();
 rewards.forEach((r) => {

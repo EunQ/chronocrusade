@@ -24,7 +24,7 @@ export class UpdateRewardHandler
   ) {}
 
   async execute(command: UpdateRewardCommand): Promise<Reward> {
-    const { rewardId, items, eventIds, lastModifiedBy } = command;
+    const { rewardId, items, eventId, lastModifiedBy } = command;
 
     const locked = await this.lockService.acquireLock(Reward.name, rewardId, 5);
     if (!locked) {
@@ -47,7 +47,7 @@ export class UpdateRewardHandler
       );
 
       if (items !== undefined) existing.items = items;
-      if (eventIds !== undefined) existing.eventIds = eventIds;
+      if (eventId !== undefined) existing.eventId = eventId;
       existing.lastModifiedBy = lastModifiedBy;
 
       existing.version += 1;

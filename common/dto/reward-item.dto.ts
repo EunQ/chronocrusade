@@ -1,17 +1,13 @@
-import { IsNumber, IsObject, IsOptional, IsString } from 'class-validator';
+import { IsNumber, IsObject, IsString } from 'class-validator';
+import { EvaluationItem } from '../../apps/chrono/src/user-reward/types/evaluationItem';
 
 export class RewardItemDto {
   @IsString()
-  type: string;
-
-  @IsOptional()
-  @IsString()
-  id?: string;
+  eventId: string;
 
   @IsNumber()
-  count: number;
+  eventVersion: number;
 
-  @IsOptional()
   @IsObject()
-  meta?: Record<string, any>;
+  evaluations: EvaluationItem[];
 }

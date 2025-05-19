@@ -23,6 +23,7 @@ export class GetRewardInfoQueryHandler
       rewardId,
       lastModifiedBy,
       types,
+      eventId,
       page = 1,
       limit = 10,
       sortBy = 'createdAt',
@@ -32,6 +33,7 @@ export class GetRewardInfoQueryHandler
     const filter: any = {};
     if (rewardId) filter.rewardId = rewardId;
     if (lastModifiedBy) filter.lastModifiedBy = lastModifiedBy;
+    if (eventId) filter.eventId = eventId;
     if (types?.length) {
       filter.items = { $elemMatch: { type: { $in: types } } };
     }

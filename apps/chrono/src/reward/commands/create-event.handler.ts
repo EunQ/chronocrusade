@@ -38,7 +38,7 @@ export class CreateRewardHandler
       const reward: Partial<Reward> = {
         rewardId: rewardId,
         items: command.items,
-        eventIds: command.eventIds,
+        eventId: command.eventId,
         lastModifiedBy: command.lastModifiedBy,
         version: 1,
       };

@@ -4,6 +4,7 @@ export class GetRewardInfoQuery implements IQuery {
   public readonly rewardId?: string;
   public readonly lastModifiedBy?: string;
   public readonly types?: string[];
+  public readonly eventId?: string;
 
   public readonly page: number;
   public readonly limit: number;
@@ -14,6 +15,7 @@ export class GetRewardInfoQuery implements IQuery {
     rewardId,
     lastModifiedBy,
     types,
+    eventId,
     page = 1,
     limit = 10,
     sortBy = 'createdAt',
@@ -21,6 +23,7 @@ export class GetRewardInfoQuery implements IQuery {
   }: {
     rewardId?: string;
     lastModifiedBy?: string;
+    eventId?: string;
     types?: string[];
     page?: number;
     limit?: number;
@@ -30,6 +33,7 @@ export class GetRewardInfoQuery implements IQuery {
     this.rewardId = rewardId;
     this.lastModifiedBy = lastModifiedBy;
     this.types = types;
+    this.eventId = eventId;
     this.page = page;
     this.limit = limit;
     this.sortBy = sortBy;

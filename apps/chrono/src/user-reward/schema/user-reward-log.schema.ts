@@ -39,6 +39,8 @@ export class UserRewardLog {
     default: UserRewardStatus.PENDING,
   })
   status: UserRewardStatus;
+
+  errorMessage?: string;
 }
 
 export const UserRewardLogSchema = SchemaFactory.createForClass(UserRewardLog);
