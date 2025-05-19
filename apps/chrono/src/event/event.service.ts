@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { EventDocument, GameEvent } from './dto/event.schema';
+import { EventDocument, GameEvent } from './schema/event.schema';
 import { QueryBus } from '@nestjs/cqrs';
 import { GetEventInfoQuery } from './queries/get-event-info.query';
 import { GetEventListDto } from './event.controller';

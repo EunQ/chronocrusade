@@ -1,6 +1,6 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { GetEventInfoQuery } from './get-event-info.query';
-import { EventDocument, GameEvent } from '../dto/event.schema';
+import { EventDocument, GameEvent } from '../schema/event.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 

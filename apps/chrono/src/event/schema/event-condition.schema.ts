@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { EventConditionType } from './event-condition.type';
+import { EventConditionType } from '../types/event-condition.type';
 
 export const EventConditionSchema = new mongoose.Schema({
   type: {

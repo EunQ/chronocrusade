@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-import { EventCondition } from './event-condition.type';
+import { EventCondition } from '../types/event-condition.type';
 import { EventConditionSchema } from './event-condition.schema';
 import { generateEventId } from '../../../../../utils/id-gen';
 

@@ -1,17 +1,8 @@
-import { Controller, Query } from '@nestjs/common';
+import { Controller } from '@nestjs/common';
 import { EventService } from './event.service';
-import { GameEvent } from './dto/event.schema';
+import { GameEvent } from './schema/event.schema';
 import { MessagePattern, Payload } from '@nestjs/microservices';
-
-export class GetEventListDto {
-  eventId?: string;
-  isActive?: boolean;
-  lastModifiedBy?: string;
-  page?: number;
-  limit?: number;
-  sortBy?: string;
-  sortOrder?: 'asc' | 'desc';
-}
+import { GetEventListDto } from './dto/get-event-list.dto';
 
 @Controller()
 export class EventController {
