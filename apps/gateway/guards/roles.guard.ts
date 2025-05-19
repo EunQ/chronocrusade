@@ -18,7 +18,8 @@ export const Roles = (...roles: Role[]) => SetMetadata(ROLES_KEY, roles);
 
 // @MatchUser(..._
 export const USER_MATCH_KEY = 'matchUser';
-export const MatchUser = () => SetMetadata(USER_MATCH_KEY, true);
+export const MatchUser = (isMatch: boolean) =>
+  SetMetadata(USER_MATCH_KEY, isMatch);
 
 @Injectable()
 export class RoleGuard implements CanActivate {
@@ -43,15 +44,12 @@ export class RoleGuard implements CanActivate {
     if (!token) throw new UnauthorizedException();
 
     const user = await firstValueFrom(
-      this.rosetteClient.send('auth/verify', { token }),
+      this.rosetteClient.send('auth.verify', { token }),
     );
-
-    //req.userId = user.id;
+    req.user = user;
 
     if (requiredRoles?.length) {
-      const hasRole = user.roles?.some((r: Role) =>
-        requiredRoles.includes(r),
-      );
+      const hasRole = user.roles?.some((r: Role) => requiredRoles.includes(r));
       if (!hasRole) throw new ForbiddenException('권한이 올바르지 않습니다.');
     }
 
