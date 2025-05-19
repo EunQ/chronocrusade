@@ -7,11 +7,7 @@ import { Reward } from '../../reward/schema/reward.schema';
 
 export type UserRewardLogDocument = UserRewardLog & Document;
 
-export type RewardSnapshotItem = Partial<Reward> & {
-  isConditionMet: boolean;
-};
-
-@Schema({ timestamps: true, collection: 'user_rewards' })
+@Schema({ timestamps: true, collection: 'user_reward_logs' })
 export class UserRewardLog {
   @Prop({ required: true })
   userId: string;
@@ -19,8 +15,11 @@ export class UserRewardLog {
   @Prop({ required: true, type: Object })
   gameEventSnapshot: Partial<GameEvent>; // 최신 기록 로그
 
-  @Prop({ required: true, type: [Object] })
-  RewardSnapshot: Partial<RewardSnapshotItem>[]; // 최신 기록 로그
+  @Prop({ required: true, type: Boolean })
+  isConditionMet: boolean;
+
+  @Prop({ required: true, type: Object })
+  rewardSnapshot: Partial<Reward>; // 최신 기록 로그
 
   @Prop({
     type: [
@@ -41,6 +40,7 @@ export class UserRewardLog {
   })
   status: UserRewardStatus;
 
+  @Prop({ required: true })
   errorMessage?: string;
 }
 

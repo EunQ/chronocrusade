@@ -1,3 +1,5 @@
+import { EvaluationItem } from '../../user-reward/types/evaluationItem';
+
 export enum EventConditionType {
   LOGIN_COUNT = 'LOGIN_COUNT',
   INVITE_FRIEND = 'INVITE_FRIEND',
@@ -12,3 +14,30 @@ export type EventCondition =
       kill_monster_id: number;
       count: number;
     };
+
+export function evaluateEventCondition(
+  condition: EventCondition,
+  evaluations: EvaluationItem[],
+): boolean {
+  const matched = evaluations.find(
+    (evaluation) => evaluation.type === condition.type,
+  );
+  if (!matched || !matched.data) return false;
+
+  switch (condition.type) {
+    case EventConditionType.LOGIN_COUNT:
+      return matched.data.loginCount >= condition.loginCount;
+
+    case EventConditionType.INVITE_FRIEND:
+      return matched.data.invite_friend >= condition.invite_friend;
+
+    case EventConditionType.MONSTER_KILL:
+      return (
+        matched.data.kill_monster_id === condition.kill_monster_id &&
+        matched.data.count >= condition.count
+      );
+
+    default:
+      return false;
+  }
+}

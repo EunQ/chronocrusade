@@ -9,9 +9,10 @@ import {
   UserRewardLog,
   UserRewardLogDocument,
 } from '../schema/user-reward-log.schema';
-import { EvaluationItem } from '../types/evaluationItem';
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { UserRewardStatus } from '../enum/user-reward.status';
+import { LockService } from '../../../../../common/lock/lock.service';
+import { evaluateEventCondition } from '../../event/types/event-condition.type';
 
 @Injectable()
 @CommandHandler(RequestUserRewardCommand)
@@ -27,6 +28,7 @@ export class RequestUserRewardHandler
     private readonly userRewardModel: Model<UserRewardDocument>,
     @InjectModel(UserRewardLog.name, 'LOG')
     private readonly userRewardLogModel: Model<UserRewardLogDocument>,
+    private readonly lockService: LockService,
   ) {}
 
   async execute(command: RequestUserRewardCommand): Promise<UserReward> {
@@ -45,38 +47,82 @@ export class RequestUserRewardHandler
     }
 
     // 실제 조건 평가 로직 (여기선 간단히 조건 key 포함 여부로 판단)
-    const allMatched = event.conditions.every((cond: any) =>
-      evaluations.some(
-        (evalItem: EvaluationItem) => evalItem.type === cond.type,
-      ),
-    );
+    const failedConditions: string[] = [];
+    const allMatched = event.conditions.every((cond: any) => {
+      const matched = evaluateEventCondition(cond, evaluations);
+      if (!matched) {
+        failedConditions.push(`조건 실패: ${cond.type}`);
+      }
+      return matched;
+    });
 
+    const errorMessage = allMatched
+      ? null
+      : failedConditions.join(', ') || '조건 불일치';
     const status = allMatched
       ? UserRewardStatus.COMPLETED
       : UserRewardStatus.FAILED;
 
     const reward = await this.rewardModel.findOne({ eventId }).lean();
 
-    //실제 혜택을 지급하는 로직이 여기에 추가.
+    const resourceId = `${userId}-${eventId}`;
+    const locked = this.lockService.acquireLock(
+      UserReward.name,
+      resourceId,
+      10,
+    );
 
-    //로그 저장
-    const log = await this.userRewardLogModel.create({
-      userId,
-      gameEventSnapshot: event,
-      RewardSnapshot: reward,
-      evaluations,
-      status,
-      errorMessage: 'errorMessage',
-    });
+    if (!locked) {
+      throw new ConflictException(
+        `이벤트지급 '${resourceId}'은 현재 처리 중입니다.`,
+      );
+    }
 
-    const userReward = await this.userRewardModel.create({
-      userId,
-      eventId,
-      eventVersion,
-      logSnapshot: log,
-      status,
-    });
+    try {
+      //실제 혜택을 지급하는 로직이 여기에 추가.
 
-    return userReward;
+      //로그 저장
+      const log = await this.userRewardLogModel.create({
+        userId,
+        gameEventSnapshot: event,
+        isConditionMet: allMatched,
+        rewardSnapshot: reward,
+        evaluations,
+        status,
+        errorMessage: errorMessage,
+      });
+
+      const existing = await this.userRewardModel.findOne({ userId, eventId });
+
+      if (existing) {
+        // 이미 존재하면 업데이트
+        await this.userRewardModel.updateOne(
+          { userId, eventId },
+          {
+            $set: {
+              eventId,
+              eventVersion,
+              logSnapshot: log,
+              status,
+            },
+          },
+        );
+
+        return this.userRewardModel.findOne({ userId, eventId }).lean();
+      } else {
+        // 없으면 새로 생성
+        const userReward = await this.userRewardModel.create({
+          userId,
+          eventId,
+          eventVersion,
+          logSnapshot: log,
+          status,
+        });
+
+        return userReward;
+      }
+    } finally {
+      await this.lockService.releaseLock(UserReward.name, resourceId);
+    }
   }
 }

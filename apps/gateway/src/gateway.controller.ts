@@ -84,7 +84,7 @@ export class GatewayController {
     return firstValueFrom(this.chronoClient.send('update.reward', body));
   }
 
-  @Post('request.userReward')
+  @Post('/user/reward')
   async requestUserReward(@Body() body: UserRewardRequest) {
     return firstValueFrom(this.chronoClient.send('request.userReward', body));
   }
