@@ -21,6 +21,7 @@ import { UpdateEventDto } from '../../../common/dto/update-event.dto';
 import { CreateRewardDto } from '../../../common/dto/create-reward.dto';
 import { UpdateRewardDto } from '../../../common/dto/update-reward.dto';
 import { UserRewardRequest } from '../../../common/dto/user-reward.request';
+import { GetUserRewardLogDto } from '../../../common/dto/get-user-reward-log.dto';
 import Any = jasmine.Any;
 
 @Controller()
@@ -70,7 +71,6 @@ export class GatewayController {
 
   @Get('/rewards')
   async findAllReward(@Query() params: GetRewardListDto): Promise<Any> {
-    console.log(JSON.stringify(params));
     return firstValueFrom(this.chronoClient.send('get.rewards', params));
   }
 
@@ -87,5 +87,10 @@ export class GatewayController {
   @Post('/user/reward')
   async requestUserReward(@Body() body: UserRewardRequest) {
     return firstValueFrom(this.chronoClient.send('request.userReward', body));
+  }
+
+  @Get('/user/reward/logs')
+  async getUserRewardLogs(@Query() params: GetUserRewardLogDto) {
+    return firstValueFrom(this.chronoClient.send('get.userRewardLogs', params));
   }
 }

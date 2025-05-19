@@ -1,13 +1,13 @@
-import { EventCondition } from '../../apps/chrono/src/event/types/event-condition.type';
+import { UserRewardStatus } from '../../apps/chrono/src/user-reward/enum/user-reward.status';
 
 export class GetUserRewardLogDto {
   constructor(
-    readonly name: string,
-    readonly description: string,
-    readonly conditions: EventCondition[],
-    readonly rewardIds: string[],
-    readonly startDate: Date,
-    readonly endDate: Date,
-    readonly isActive: boolean,
+    readonly userId?: string,
+    readonly eventId?: string,
+    readonly status?: UserRewardStatus,
+    readonly page?: number,
+    readonly limit?: number,
+    readonly sortBy?: string,
+    readonly sortOrder?: 'asc' | 'desc',
   ) {}
 }

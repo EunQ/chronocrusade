@@ -12,6 +12,7 @@ import {
   UserRewardLog,
   UserRewardLogSchema,
 } from './schema/user-reward-log.schema';
+import { GetUserRewardLogHandler } from './queries/get-user-reward-log.handler';
 
 @Module({
   imports: [
@@ -37,6 +38,10 @@ import {
     ),
   ],
   controllers: [UserRewardController],
-  providers: [UserRewardService, RequestUserRewardHandler],
+  providers: [
+    UserRewardService,
+    RequestUserRewardHandler,
+    GetUserRewardLogHandler,
+  ],
 })
 export class UserRewardModule {}
