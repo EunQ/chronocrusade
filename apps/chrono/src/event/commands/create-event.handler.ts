@@ -11,7 +11,7 @@ import { LockService } from '../../../../../common/lock/lock.service';
 @CommandHandler(CreateEventCommand)
 export class CreateEventHandler implements ICommandHandler<CreateEventCommand> {
   constructor(
-    @InjectModel(GameEvent.name, 'EVENT')
+    @InjectModel(GameEvent.name)
     private readonly eventModel: Model<EventDocument>,
     private readonly lockService: LockService,
   ) {}

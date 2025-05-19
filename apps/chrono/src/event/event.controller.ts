@@ -3,6 +3,7 @@ import { EventService } from './event.service';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { GetEventListDto } from '../../../../common/dto/get-event-list.dto';
 import { CreateEventDto } from '../../../../common/dto/create-event.dto';
+import { UpdateEventDto } from '../../../../common/dto/update-event.dto';
 
 @Controller()
 export class EventController {
@@ -28,13 +29,13 @@ export class EventController {
   //   "isActive": true
   // }
   @MessagePattern('create.event')
-  async createEventList(@Payload() queryDto?: CreateEventDto) {
+  async createEvent(@Payload() queryDto?: CreateEventDto) {
     if (queryDto == null) throw new UnauthorizedException();
-    return this.eventService.createEventList(queryDto, 'admin1');
+    return this.eventService.createEvent(queryDto, 'admin1');
   }
 
-  // @MessagePattern('update.events')
-  // async updateEventList(@Payload() queryDto?: GetEventListDto) {
-  //   return this.eventService.getEventList(queryDto ?? {});
-  // }
+  @MessagePattern('update.event')
+  async updateEventList(@Payload() queryDto: UpdateEventDto) {
+    return this.eventService.updateEvent(queryDto, 'admin1');
+  }
 }

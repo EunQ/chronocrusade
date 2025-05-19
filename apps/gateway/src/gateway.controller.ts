@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Inject, Post, Query, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Inject, Post, Put, Query, Req, UseGuards } from '@nestjs/common';
 import { GatewayService } from './gateway.service';
 import { ClientProxy, Payload } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
@@ -9,6 +9,7 @@ import Any = jasmine.Any;
 import { GetEventListDto } from '../../../common/dto/get-event-list.dto';
 import { GetRewardListDto } from '../../../common/dto/get-reward-list.dto';
 import { CreateEventDto } from '../../../common/dto/create-event.dto';
+import { UpdateEventDto } from '../../../common/dto/update-event.dto';
 
 @Controller()
 export class GatewayController {
@@ -62,6 +63,13 @@ export class GatewayController {
   @Post('/event')
   async createEvent(@Body() body: CreateEventDto): Promise<Any> {
     return firstValueFrom(this.chronoClient.send('create.event', body));
+  }
+
+  @Put('/event')
+  async updateEvent(
+    @Body() body: UpdateEventDto,
+  ): Promise<Any> {
+    return firstValueFrom(this.chronoClient.send('update.event', body));
   }
 
   @Get('/rewards')

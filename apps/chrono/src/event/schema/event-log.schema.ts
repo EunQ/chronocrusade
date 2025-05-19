@@ -8,10 +8,10 @@ export enum EventLogAction {
   DELETE = 'delete',
 }
 
-export type EventLogDocument = EventLog & Document;
+export type EventLogDocument = GameEventLog & Document;
 
 @Schema({ timestamps: true, collection: 'event_logs' })
-export class EventLog {
+export class GameEventLog {
   @Prop({ type: Types.ObjectId, required: true, ref: 'Event' })
   eventId: Types.ObjectId; // 원본 이벤트 참조
 
@@ -31,4 +31,4 @@ export class EventLog {
   modifiedAt: Date;
 }
 
-export const EventLogSchema = SchemaFactory.createForClass(EventLog);
+export const EventLogSchema = SchemaFactory.createForClass(GameEventLog);

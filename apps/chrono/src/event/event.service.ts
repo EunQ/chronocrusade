@@ -4,6 +4,8 @@ import { GetEventInfoQuery } from './queries/get-event-info.query';
 import { GetEventListDto } from '../../../../common/dto/get-event-list.dto';
 import { CreateEventDto } from '../../../../common/dto/create-event.dto';
 import { CreateEventCommand } from './commands/create-event.command';
+import { UpdateEventDto } from '../../../../common/dto/update-event.dto';
+import { UpdateEventCommand } from './commands/update-event.command';
 
 @Injectable()
 export class EventService {
@@ -26,8 +28,24 @@ export class EventService {
     return this.queryBus.execute(query);
   }
 
-  async createEventList(dto: CreateEventDto, lastModifiedBy: string) {
+  async createEvent(dto: CreateEventDto, lastModifiedBy: string) {
     const command = new CreateEventCommand(
+      dto.name,
+      dto.description,
+      dto.conditions,
+      dto.rewardIds,
+      dto.startDate,
+      dto.endDate,
+      dto.isActive,
+      lastModifiedBy,
+    );
+
+    return this.commandBus.execute(command);
+  }
+
+  updateEvent(dto: UpdateEventDto, lastModifiedBy: string) {
+    const command = new UpdateEventCommand(
+      dto.eventId,
       dto.name,
       dto.description,
       dto.conditions,
