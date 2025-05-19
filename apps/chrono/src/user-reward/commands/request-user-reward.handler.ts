@@ -111,18 +111,63 @@ export class RequestUserRewardHandler
           },
         );
 
-        return this.userRewardModel.findOne({ userId, eventId }).lean();
+        return this.userRewardModel
+          .findOne(
+            { userId, eventId },
+            {
+              _id: 0,
+              __v: 0,
+              'logSnapshot._id': 0,
+              'logSnapshot.__v': 0,
+              'logSnapshot.updatedAt': 0,
+              'logSnapshot.createdAt': 0,
+              'logSnapshot.rewardSnapshot._id': 0,
+              'logSnapshot.rewardSnapshot.__v': 0,
+              'logSnapshot.rewardSnapshot.updatedAt': 0,
+              'logSnapshot.rewardSnapshot.createdAt': 0,
+              'logSnapshot.gameEventSnapshot._id': 0,
+              'logSnapshot.gameEventSnapshot.__v': 0,
+              'logSnapshot.gameEventSnapshot.updatedAt': 0,
+              'logSnapshot.gameEventSnapshot.createdAt': 0,
+              'logSnapshot.evaluations._id': 0,
+              updatedAt: 0,
+              createdAt: 0,
+            },
+          )
+          .lean();
       } else {
         // 없으면 새로 생성
-        const userReward = await this.userRewardModel.create({
+        await this.userRewardModel.create({
           userId,
           eventId,
           eventVersion,
           logSnapshot: log,
           status,
         });
-
-        return userReward;
+        return this.userRewardModel
+          .findOne(
+            { userId, eventId },
+            {
+              _id: 0,
+              __v: 0,
+              'logSnapshot._id': 0,
+              'logSnapshot.__v': 0,
+              'logSnapshot.updatedAt': 0,
+              'logSnapshot.createdAt': 0,
+              'logSnapshot.rewardSnapshot._id': 0,
+              'logSnapshot.rewardSnapshot.__v': 0,
+              'logSnapshot.rewardSnapshot.updatedAt': 0,
+              'logSnapshot.rewardSnapshot.createdAt': 0,
+              'logSnapshot.gameEventSnapshot._id': 0,
+              'logSnapshot.gameEventSnapshot.__v': 0,
+              'logSnapshot.gameEventSnapshot.updatedAt': 0,
+              'logSnapshot.gameEventSnapshot.createdAt': 0,
+              'logSnapshot.evaluations._id': 0,
+              updatedAt: 0,
+              createdAt: 0,
+            },
+          )
+          .lean();
       }
     } finally {
       await this.lockService.releaseLock(UserReward.name, resourceId);

@@ -66,6 +66,23 @@ export class GetUserRewardLogHandler
         { $sort: sort },
         { $skip: skip },
         { $limit: limit },
+        {
+          $project: {
+            _id: 0,
+            __v: 0,
+            updatedAt: 0,
+            createdAt: 0,
+            'rewardSnapshot._id': 0,
+            'rewardSnapshot.__v': 0,
+            'rewardSnapshot.updatedAt': 0,
+            'rewardSnapshot.createdAt': 0,
+            'gameEventSnapshot._id': 0,
+            'gameEventSnapshot.__v': 0,
+            'gameEventSnapshot.updatedAt': 0,
+            'gameEventSnapshot.createdAt': 0,
+            'evaluations._id': 0,
+          },
+        },
       ]),
       this.userRewardLogModel.countDocuments(filter),
     ]);
