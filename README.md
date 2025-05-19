@@ -144,3 +144,128 @@ Log DB에는 `event_logs` `reward_logs` 각각 존재, event, reward가 수정�
 > * 마이크로서비스별 책임 분리
 > * 로그/기록용 DB는 별도로 분리하여 관리 유의성 향상
 > * Lock 설계 의도는 멀티 프로세스 및 쓰레딩 환경에서 일관성을 유지하기 위해. 
+
+---
+
+## 🐋 Docker 설정
+
+### ⚡️ MSA (마이크로서비스) 구조
+
+모든 프로젝트는 다음과 같은 MSA 구조에 따른 NestJS 개발 경험치에 맞춰 구성되어 있습니다.
+
+```
+Gateway (API Gateway)
+  ├── Rosette (JWT 인증/인가 관리)
+  └── Chrono (Event, Reward, RewardLog 관리)
+```
+
+* **Gateway**: 클라이언트의 다음 요청을 각 서비스로 발신
+* **Rosette**: 사용자 JWT 인증, 인가, 회원가입/로그인 관리
+* **Chrono**: 이벤트 등록, 보상 지구, 사용자 보상 로그 관리
+
+---
+
+### 💪 Docker 전체 시작
+
+프로젝트 루트 경로에서 다음 명령을 실행합니다.
+
+```bash
+docker-compose build && docker-compose up -d
+```
+
+해당 명령은 다음 서비스들을 동시에 구성합니다:
+
+* `gateway-service` (port: 3000)
+* `rosette-service` (port: 8877)
+* `chrono-service` (port: 8878)
+* `mongodb` (port: 27017)
+
+.env.docker 파일 등을 통해 NestJS 개발과 구분되고, 각 NestJS 구현체에서 `ConfigModule.forRoot` 를 통해 가장 매칭된 env 파일을 읽어서 시작됩니다.
+
+---
+
+### ⚡️ 목표: DB만 Docker를 도입하고 NestJS가 로컬에서 실행.
+
+1. MongoDB만 Docker로 시작:
+
+```bash
+cd ./local-mongo-db && docker-compose up -d
+```
+
+```
+`local-mongo-db` 폴더는 로컬 MongoDB 시작을 위한 파일들이 있음 (초기화 데이터 포함)
+```
+
+2. NestJS 서버는 로컬에서 다음 명령어로 실행:
+
+```bash
+npm run start:dev
+```
+
+---
+
+## 🤩 프로그램 설계 및 로직 설명
+
+### 1. 전체 도메인 구성
+
+서비스는 다음과 같이 4개의 도메인으로 설계되었습니다:
+
+* **User**: 사용자 계정, 인증 및 권한 정보 관리
+* **Events**: 보상지급 조건을 담고 있는 게임 내 이벤트 관리
+* **Rewards**: 보상 관리 (Gold, Exp, Coupon 등)
+* **UserRewards**: 사용자 이벤트 참여 실패/성공 이력관리
+
+---
+
+### 2. Event ↔ Reward 관계
+
+처음에는 **N\:M 관계**로 설계하려 했지만, 향후 데이터가 많아지면 관리가 여러울점을 고려해 **1:1 관계**로 단순화 <br/>
+`Reward`는 MongoDB의 수정에 자유로운 특징을 활용해 어떤 보상이 오더라도 추가되게 셜계함.
+
+``` JSON
+//Reward 컬렉션에 있는 컬럼 중 하나인 RewardItem
+export type RewardItem = {
+  type: string; // ex: gold, exp, coupon, item, etc.
+  id?: string | null; // ex: 쿠폰 코드, 아이템 ID 등
+  count: number; // 지급 수량
+  meta?: Record<string, any>; // 추가 속성 (optional)
+};
+```
+
+---
+
+### 3. 분산 환경 대비 Lock 처리
+
+* Node.js는 기본적으로 싱글 스레드 기반이지만, **멀티 프로세스 또는 MSA 환경을 고려**해 동시성 제어를 위해 **Lock 시스템** 구현
+* Lock은 MongoDB 기반으로 구현:
+
+    * 이유: 크기가 작고, TTL이 짧아 빠른 회수 가능
+    * 분산 Lock이 필요한 방식(ex. `user/reward` 데이터 지급)에 적용
+
+---
+
+### 4. 보상 지급 조건
+
+* `POST /user/reward` API의 로직은 다음과 같다.
+
+    1. 유저는 데이터(eventId, eventVersion, 평가데이터, JWT (header 'Authorization: ...))을 호출한다.:
+       ```ts
+       export class UserRewardRequest {
+          userId: string;
+          eventId: string;
+          eventVersion: number;
+          evaluations: EvaluationItem[];
+        }
+       
+       export type EvaluationItem = {
+         type: string;
+         data: Record<string, any>;
+       };
+       ```
+    2. 서버는 이벤트에 등록된 모든 조건을 검사:
+        * 모든 조건이 맞으면 `COMPLETED`
+        * 하나라도 맞지 않으면 `FAILED`
+
+    3. 처리 결과는 `UserRewardLog`에 기록:
+        * `logSnapshot`으로 현재 상황 스냅샷 저장
+        * 이벤트 또는 조건이 변경되든 과거 기록 추적 가능
