@@ -4,17 +4,39 @@ import { RewardController } from './reward.controller';
 import { CqrsModule } from '@nestjs/cqrs';
 import { GetRewardInfoQueryHandler } from './queries/get-reward-info.hanlder';
 import { MongooseModule } from '@nestjs/mongoose';
-import { EventSchema, GameEvent } from '../event/schema/event.schema';
 import { Reward, RewardSchema } from './schema/reward.schema';
+import { RewardLog, RewardLogSchema } from './schema/reward-log.schema';
+import { RewardUpdatedEventHandler } from './domain-events/reward-update.handler';
+import { CreateRewardHandler } from './commands/create-event.handler';
+import { UpdateRewardHandler } from './commands/update-event.handler';
+import { LockModule } from '../../../../common/lock/lock.module';
 
 @Module({
-  imports: [CqrsModule,
+  imports: [
+    CqrsModule,
+    LockModule,
     MongooseModule.forRoot(
       'mongodb://root:1234@localhost:27017/game?authSource=admin',
     ),
+    MongooseModule.forRoot(
+      'mongodb://root:1234@localhost:27017/log?authSource=admin',
+      {
+        connectionName: 'LOG',
+      },
+    ),
     MongooseModule.forFeature([{ name: Reward.name, schema: RewardSchema }]),
+    MongooseModule.forFeature(
+      [{ name: RewardLog.name, schema: RewardLogSchema }],
+      'LOG',
+    ),
   ],
   controllers: [RewardController],
-  providers: [RewardService, GetRewardInfoQueryHandler],
+  providers: [
+    RewardService,
+    GetRewardInfoQueryHandler,
+    CreateRewardHandler,
+    UpdateRewardHandler,
+    RewardUpdatedEventHandler,
+  ],
 })
 export class RewardModule {}
