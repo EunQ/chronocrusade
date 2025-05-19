@@ -1,11 +1,12 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CreateEventCommand } from './create-event.command';
 import { InjectModel } from '@nestjs/mongoose';
-import { GameEvent, EventDocument } from '../schema/event.schema';
+import { EventDocument, GameEvent } from '../schema/event.schema';
 import { Model } from 'mongoose';
-import { ConflictException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { generateEventId } from '../../../../../utils/id-gen';
 import { LockService } from '../../../../../common/lock/lock.service';
+import { RpcException } from '@nestjs/microservices';
 
 @Injectable()
 @CommandHandler(CreateEventCommand)
@@ -37,9 +38,7 @@ export class CreateEventHandler implements ICommandHandler<CreateEventCommand> {
       5,
     );
     if (!locked) {
-      throw new ConflictException(
-        `이벤트 '${resourceId}'는 현재 처리 중입니다.`,
-      );
+      throw new RpcException(`이벤트 '${resourceId}'는 현재 처리 중입니다.`);
     }
 
     try {

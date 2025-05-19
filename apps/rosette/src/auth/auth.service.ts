@@ -3,7 +3,7 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { Payload } from '@nestjs/microservices';
+import { Payload, RpcException } from '@nestjs/microservices';
 import { JwtService } from '@nestjs/jwt';
 import { User, UserDocument } from './dto/auth-user.schema';
 import { Model } from 'mongoose';
@@ -26,13 +26,13 @@ export class AuthService {
   async handleLogin(@Payload() data: LoginUserDto) {
     const user = await this.userModel.findOne({ id: data.loginId }).exec();
     if (!user) {
-      throw new UnauthorizedException('사용자를 찾을 수 없습니다.');
+      throw new RpcException('사용자를 찾을 수 없습니다.');
     }
 
     if (user.encPassword) {
       const isMatch = await isPasswordMatch(data.password, user.encPassword);
       if (!isMatch) {
-        throw new UnauthorizedException('사용자를 찾을 수 없습니다.');
+        throw new RpcException('사용자를 찾을 수 없습니다.');
       }
     }
 
@@ -45,14 +45,12 @@ export class AuthService {
   async createUser(dto: CreateUserDto) {
     const locked = this.lockService.acquireLock(User.name, dto.loginId, 10);
     if (!locked) {
-      throw new ConflictException(
-        `유저 '${dto.loginId}'는 현재 수정 중입니다.`,
-      );
+      throw new RpcException(`유저 '${dto.loginId}'는 현재 수정 중입니다.`);
     }
 
     try {
       const exists = await this.userModel.exists({ id: dto.loginId });
-      if (exists) throw new ConflictException('이미 존재하는 사용자입니다.');
+      if (exists) throw new RpcException('이미 존재하는 사용자입니다.');
 
       const encPassword = await hashPassword(dto.password);
 
@@ -71,19 +69,19 @@ export class AuthService {
   async updateUser(dto: UpdateUserDto) {
     const locked = this.lockService.acquireLock(User.name, dto.loginId, 10);
     if (!locked) {
-      throw new ConflictException(
+      throw new RpcException(
         `유저 '${dto.loginId}'는 현재 수정 중입니다.`,
       );
     }
 
     try {
       const user = await this.userModel.findOne({ id: dto.loginId });
-      if (!user) throw new NotFoundException('사용자를 찾을 수 없습니다.');
+      if (!user) throw new RpcException('사용자를 찾을 수 없습니다.');
 
       if (user.encPassword) {
         const isMatch = await isPasswordMatch(dto.password, user.encPassword);
         if (!isMatch) {
-          throw new UnauthorizedException('사용자를 찾을 수 없습니다.');
+          throw new RpcException('사용자를 찾을 수 없습니다.');
         }
       }
 
@@ -104,14 +102,14 @@ export class AuthService {
   async adminUpdateUser(dto: AdminUpdateUserDto) {
     const locked = this.lockService.acquireLock(User.name, dto.loginId, 10);
     if (!locked) {
-      throw new ConflictException(
+      throw new RpcException(
         `유저 '${dto.loginId}'는 현재 수정 중입니다.`,
       );
     }
 
     try {
       const user = await this.userModel.findOne({ id: dto.loginId });
-      if (!user) throw new NotFoundException('사용자를 찾을 수 없습니다.');
+      if (!user) throw new RpcException('사용자를 찾을 수 없습니다.');
 
       if (dto.password) {
         user.encPassword = await hashPassword(dto.password);

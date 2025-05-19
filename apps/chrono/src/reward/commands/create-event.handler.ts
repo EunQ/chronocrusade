@@ -4,8 +4,9 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Reward, RewardDocument } from '../schema/reward.schema';
 import { generateRewardId } from '../../../../../utils/id-gen';
-import { ConflictException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { LockService } from '../../../../../common/lock/lock.service';
+import { RpcException } from '@nestjs/microservices';
 
 @Injectable()
 @CommandHandler(CreateRewardCommand)
@@ -29,9 +30,7 @@ export class CreateRewardHandler
     );
 
     if (!locked) {
-      throw new ConflictException(
-        `이벤트 '${resourceId}'는 현재 처리 중입니다.`,
-      );
+      throw new RpcException(`이벤트 '${resourceId}'는 현재 처리 중입니다.`);
     }
 
     try {

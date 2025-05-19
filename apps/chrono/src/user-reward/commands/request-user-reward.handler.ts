@@ -9,10 +9,11 @@ import {
   UserRewardLog,
   UserRewardLogDocument,
 } from '../schema/user-reward-log.schema';
-import { ConflictException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { UserRewardStatus } from '../enum/user-reward.status';
 import { LockService } from '../../../../../common/lock/lock.service';
 import { evaluateEventCondition } from '../../event/types/event-condition.type';
+import { RpcException } from '@nestjs/microservices';
 
 @Injectable()
 @CommandHandler(RequestUserRewardCommand)
@@ -73,7 +74,7 @@ export class RequestUserRewardHandler
     );
 
     if (!locked) {
-      throw new ConflictException(
+      throw new RpcException(
         `이벤트지급 '${resourceId}'은 현재 처리 중입니다.`,
       );
     }

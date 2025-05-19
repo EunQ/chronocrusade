@@ -50,14 +50,15 @@ export class RoleGuard implements CanActivate {
 
     if (requiredRoles?.length) {
       const hasRole = user.roles?.some((r: Role) => requiredRoles.includes(r));
-      if (!hasRole) throw new ForbiddenException('권한이 올바르지 않습니다.');
+      if (!hasRole)
+        throw new UnauthorizedException('권한이 올바르지 않습니다.');
     }
 
     if (matchUser) {
       const paramUserId =
         req.params?.userId || req.body?.userId || req.query?.userId;
       if (!paramUserId || paramUserId !== user.id) {
-        throw new ForbiddenException('사용자 정보가 일치하지 않습니다.');
+        throw new UnauthorizedException('사용자 정보가 일치하지 않습니다.');
       }
     }
     return true;

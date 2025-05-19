@@ -10,6 +10,7 @@ import {
 import { UpdateRewardCommand } from './update-event.command';
 import { LockService } from '../../../../../common/lock/lock.service';
 import { RewardUpdatedEvent } from '../domain-events/reward-updated.event';
+import { RpcException } from '@nestjs/microservices';
 
 @Injectable()
 @CommandHandler(UpdateRewardCommand)
@@ -28,13 +29,13 @@ export class UpdateRewardHandler
 
     const locked = await this.lockService.acquireLock(Reward.name, rewardId, 5);
     if (!locked) {
-      throw new ConflictException(`보상 '${rewardId}'은 현재 수정 중입니다.`);
+      throw new RpcException(`보상 '${rewardId}'은 현재 수정 중입니다.`);
     }
 
     try {
       const existing = await this.rewardModel.findOne({ rewardId }).exec();
       if (!existing) {
-        throw new NotFoundException(`Reward '${rewardId}' not found`);
+        throw new RpcException(`Reward '${rewardId}' not found`);
       }
 
       this.eventBus.publish(

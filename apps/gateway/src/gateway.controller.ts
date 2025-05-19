@@ -4,6 +4,7 @@ import {
   ForbiddenException,
   Get,
   Inject,
+  InternalServerErrorException,
   Post,
   Put,
   Query,
@@ -12,7 +13,7 @@ import {
 } from '@nestjs/common';
 import { GatewayService } from './gateway.service';
 import { ClientProxy } from '@nestjs/microservices';
-import { firstValueFrom } from 'rxjs';
+import { catchError, firstValueFrom } from 'rxjs';
 import { MatchUser, RoleGuard, Roles } from '../guards/roles.guard';
 import { GetEventListDto } from '../../../common/dto/get-event-list.dto';
 import { GetRewardListDto } from '../../../common/dto/get-reward-list.dto';
@@ -40,26 +41,50 @@ export class GatewayController {
   @Post('/auth/login')
   async login(@Body() body: LoginUserDto): Promise<{ token: string }> {
     const { token } = await firstValueFrom(
-      this.rosetteClient.send('auth.login', body),
+      this.rosetteClient.send('auth.login', body).pipe(
+        catchError((error) => {
+          const errorMessage = error?.message || 'Internal server error';
+          throw new InternalServerErrorException(errorMessage);
+        }),
+      ),
     );
     return { token };
   }
 
   @Post('/user/signin')
   async signin(@Body() body: CreateUserDto) {
-    return await firstValueFrom(this.rosetteClient.send('sigin.user', body));
+    return await firstValueFrom(
+      this.rosetteClient.send('sigin.user', body).pipe(
+        catchError((error) => {
+          const errorMessage = error?.message || 'Internal server error';
+          throw new InternalServerErrorException(errorMessage);
+        }),
+      ),
+    );
   }
 
   @Post('/user')
   async updateUser(@Body() body: UpdateUserDto) {
-    return await firstValueFrom(this.rosetteClient.send('update.user', body));
+    return await firstValueFrom(
+      this.rosetteClient.send('update.user', body).pipe(
+        catchError((error) => {
+          const errorMessage = error?.message || 'Internal server error';
+          throw new InternalServerErrorException(errorMessage);
+        }),
+      ),
+    );
   }
 
   @Post('/admin/user')
   @Roles(Role.ADMIN)
   async adminUpdateUser(@Body() body: AdminUpdateUserDto) {
     return await firstValueFrom(
-      this.rosetteClient.send('admin.update.user', body),
+      this.rosetteClient.send('admin.update.user', body).pipe(
+        catchError((error) => {
+          const errorMessage = error?.message || 'Internal server error';
+          throw new InternalServerErrorException(errorMessage);
+        }),
+      ),
     );
   }
 
@@ -70,7 +95,14 @@ export class GatewayController {
   @UseGuards(RoleGuard)
   @Roles(Role.ADMIN, Role.OPERATOR)
   async getEvents(@Query() params: GetEventListDto) {
-    return firstValueFrom(this.chronoClient.send('get.events', params));
+    return firstValueFrom(
+      this.chronoClient.send('get.events', params).pipe(
+        catchError((error) => {
+          const errorMessage = error?.message || 'Internal server error';
+          throw new InternalServerErrorException(errorMessage);
+        }),
+      ),
+    );
   }
 
   /*
@@ -79,7 +111,14 @@ export class GatewayController {
   @Post('/event')
   @Roles(Role.ADMIN, Role.OPERATOR)
   async createEvent(@Body() body: CreateEventDto): Promise<Any> {
-    return firstValueFrom(this.chronoClient.send('create.event', body));
+    return firstValueFrom(
+      this.chronoClient.send('create.event', body).pipe(
+        catchError((error) => {
+          const errorMessage = error?.message || 'Internal server error';
+          throw new InternalServerErrorException(errorMessage);
+        }),
+      ),
+    );
   }
 
   /*
@@ -88,7 +127,14 @@ export class GatewayController {
   @Put('/event')
   @Roles(Role.ADMIN, Role.OPERATOR)
   async updateEvent(@Body() body: UpdateEventDto): Promise<Any> {
-    return firstValueFrom(this.chronoClient.send('update.event', body));
+    return firstValueFrom(
+      this.chronoClient.send('update.event', body).pipe(
+        catchError((error) => {
+          const errorMessage = error?.message || 'Internal server error';
+          throw new InternalServerErrorException(errorMessage);
+        }),
+      ),
+    );
   }
 
   /*
@@ -97,7 +143,14 @@ export class GatewayController {
   @Get('/rewards')
   @Roles(Role.ADMIN, Role.OPERATOR)
   async findAllReward(@Query() params: GetRewardListDto): Promise<Any> {
-    return firstValueFrom(this.chronoClient.send('get.rewards', params));
+    return firstValueFrom(
+      this.chronoClient.send('get.rewards', params).pipe(
+        catchError((error) => {
+          const errorMessage = error?.message || 'Internal server error';
+          throw new InternalServerErrorException(errorMessage);
+        }),
+      ),
+    );
   }
 
   /*
@@ -106,7 +159,14 @@ export class GatewayController {
   @Post('/reward')
   @Roles(Role.ADMIN, Role.OPERATOR)
   async createReward(@Body() body: CreateRewardDto): Promise<Any> {
-    return firstValueFrom(this.chronoClient.send('create.reward', body));
+    return firstValueFrom(
+      this.chronoClient.send('create.reward', body).pipe(
+        catchError((error) => {
+          const errorMessage = error?.message || 'Internal server error';
+          throw new InternalServerErrorException(errorMessage);
+        }),
+      ),
+    );
   }
 
   /*
@@ -115,7 +175,14 @@ export class GatewayController {
   @Put('/reward')
   @Roles(Role.ADMIN, Role.OPERATOR)
   async updateReward(@Body() body: UpdateRewardDto): Promise<Any> {
-    return firstValueFrom(this.chronoClient.send('update.reward', body));
+    return firstValueFrom(
+      this.chronoClient.send('update.reward', body).pipe(
+        catchError((error) => {
+          const errorMessage = error?.message || 'Internal server error';
+          throw new InternalServerErrorException(errorMessage);
+        }),
+      ),
+    );
   }
 
   /*
@@ -125,7 +192,14 @@ export class GatewayController {
   @MatchUser(true)
   @Roles(Role.USER)
   async requestUserReward(@Body() body: UserRewardRequest) {
-    return firstValueFrom(this.chronoClient.send('request.userReward', body));
+    return firstValueFrom(
+      this.chronoClient.send('request.userReward', body).pipe(
+        catchError((error) => {
+          const errorMessage = error?.message || 'Internal server error';
+          throw new InternalServerErrorException(errorMessage);
+        }),
+      ),
+    );
   }
 
   @Get('/user/reward/logs')
@@ -141,6 +215,13 @@ export class GatewayController {
       }
     }
 
-    return firstValueFrom(this.chronoClient.send('get.userRewardLogs', params));
+    return firstValueFrom(
+      this.chronoClient.send('get.userRewardLogs', params).pipe(
+        catchError((error) => {
+          const errorMessage = error?.message || 'Internal server error';
+          throw new InternalServerErrorException(errorMessage);
+        }),
+      ),
+    );
   }
 }

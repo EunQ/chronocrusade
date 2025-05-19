@@ -1,15 +1,12 @@
 import { CommandHandler, EventBus, ICommandHandler } from '@nestjs/cqrs';
 import { UpdateEventCommand } from './update-event.command';
 import { InjectModel } from '@nestjs/mongoose';
-import { GameEvent, EventDocument } from '../schema/event.schema';
+import { EventDocument, GameEvent } from '../schema/event.schema';
 import { Model } from 'mongoose';
-import {
-  ConflictException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { LockService } from '../../../../../common/lock/lock.service';
 import { EventUpdatedEvent } from '../domain-events/event-updated.event';
+import { RpcException } from '@nestjs/microservices';
 
 @Injectable()
 @CommandHandler(UpdateEventCommand)
@@ -40,13 +37,13 @@ export class UpdateEventHandler implements ICommandHandler<UpdateEventCommand> {
       5,
     );
     if (!locked) {
-      throw new ConflictException(`이벤트 '${eventId}'는 현재 수정 중입니다.`);
+      throw new RpcException(`이벤트 '${eventId}'는 현재 수정 중입니다.`);
     }
 
     try {
       const existingEvent = await this.eventModel.findOne({ eventId }).exec();
       if (!existingEvent) {
-        throw new NotFoundException(`이벤트 '${eventId}'를 찾을 수 없습니다.`);
+        throw new RpcException(`이벤트 '${eventId}'를 찾을 수 없습니다.`);
       }
 
       this.eventBus.publish(
