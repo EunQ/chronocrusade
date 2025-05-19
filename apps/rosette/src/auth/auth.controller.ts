@@ -20,8 +20,8 @@ export class AuthController {
     return this.authService.verify({ token });
   }
 
-  @MessagePattern('signin.user')
-  async signIn(@Payload() dto: CreateUserDto) {
+  @MessagePattern('signup.user')
+  async signup(@Payload() dto: CreateUserDto) {
     return this.authService.createUser(dto);
   }
 

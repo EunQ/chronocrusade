@@ -51,10 +51,10 @@ export class GatewayController {
     return { token };
   }
 
-  @Post('/user/signin')
-  async signin(@Body() body: CreateUserDto) {
+  @Post('/user/signup')
+  async signup(@Body() body: CreateUserDto) {
     return await firstValueFrom(
-      this.rosetteClient.send('sigin.user', body).pipe(
+      this.rosetteClient.send('signup.user', body).pipe(
         catchError((error) => {
           const errorMessage = error?.message || 'Internal server error';
           throw new InternalServerErrorException(errorMessage);
