@@ -2,13 +2,14 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import { EventCondition } from './event-condition.type';
 import { EventConditionSchema } from './event-condition.schema';
-import { EventReward } from './event-reward.type';
-import { EventRewardSchema } from './event-reward.schema';
 
 export type EventDocument = GameEvent & Document;
 
 @Schema({ timestamps: true, collection: 'events' }) // 생성일/수정일 자동 저장
 export class GameEvent {
+  @Prop({ required: true, unique: true })
+  eventId: string; // 외부 노출용 식별자
+
   @Prop({ required: true })
   name: string; // 이벤트 이름
 
@@ -16,10 +17,10 @@ export class GameEvent {
   description: string; // 이벤트 이름
 
   @Prop({ required: true, type: [EventConditionSchema] })
-  conditions: EventCondition[]; // 예: ['로그인 3일', '친구 초대']
+  conditions: EventCondition[]; // 이벤트 조건.
 
-  @Prop({ required: true, type: [EventRewardSchema] })
-  reward: EventReward;
+  @Prop({ type: [String], required: true })
+  rewardIds: string[]; // 참조용 rewardId 배열
 
   @Prop({ required: true })
   startDate: Date;

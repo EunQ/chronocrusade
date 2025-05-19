@@ -1,0 +1,34 @@
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Document } from 'mongoose';
+
+export class CouponReward {
+  @Prop({ required: true })
+  id: string;
+
+  @Prop({ required: true })
+  count: number;
+}
+
+@Schema({ timestamps: true, collection: 'rewards' })
+export class Reward {
+  @Prop({ required: true, unique: true })
+  rewardId: string;
+
+  @Prop({ required: true })
+  type: string;
+
+  @Prop({ type: [CouponReward], default: [] })
+  coupons?: CouponReward[];
+
+  @Prop()
+  gold?: number;
+
+  @Prop()
+  exp?: number;
+
+  @Prop({ type: [String], default: [] })
+  eventIds: string[];
+}
+
+export type RewardDocument = Reward & Document;
+export const RewardSchema = SchemaFactory.createForClass(Reward);
