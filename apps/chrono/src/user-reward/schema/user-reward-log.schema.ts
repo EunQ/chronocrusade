@@ -40,7 +40,7 @@ export class UserRewardLog {
   })
   status: UserRewardStatus;
 
-  @Prop({ required: true })
+  @Prop({ type: String, default: null })
   errorMessage?: string;
 }
 

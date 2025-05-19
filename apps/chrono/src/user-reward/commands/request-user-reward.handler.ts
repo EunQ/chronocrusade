@@ -80,6 +80,10 @@ export class RequestUserRewardHandler
 
     try {
       //실제 혜택을 지급하는 로직이 여기에 추가.
+      const existing = await this.userRewardModel.findOne({ userId, eventId });
+      if (existing && existing.status == UserRewardStatus.COMPLETED) {
+        return existing;
+      }
 
       //로그 저장
       const log = await this.userRewardLogModel.create({
@@ -91,8 +95,6 @@ export class RequestUserRewardHandler
         status,
         errorMessage: errorMessage,
       });
-
-      const existing = await this.userRewardModel.findOne({ userId, eventId });
 
       if (existing) {
         // 이미 존재하면 업데이트

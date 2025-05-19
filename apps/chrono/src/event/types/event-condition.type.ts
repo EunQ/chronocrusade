@@ -19,25 +19,24 @@ export function evaluateEventCondition(
   condition: EventCondition,
   evaluations: EvaluationItem[],
 ): boolean {
-  const matched = evaluations.find(
-    (evaluation) => evaluation.type === condition.type,
-  );
-  if (!matched || !matched.data) return false;
+  return evaluations.some((evaluation) => {
+    if (evaluation.type !== condition.type || !evaluation.data) return false;
 
-  switch (condition.type) {
-    case EventConditionType.LOGIN_COUNT:
-      return matched.data.loginCount >= condition.loginCount;
+    switch (condition.type) {
+      case EventConditionType.LOGIN_COUNT:
+        return evaluation.data.loginCount >= condition.loginCount;
 
-    case EventConditionType.INVITE_FRIEND:
-      return matched.data.invite_friend >= condition.invite_friend;
+      case EventConditionType.INVITE_FRIEND:
+        return evaluation.data.invite_friend >= condition.invite_friend;
 
-    case EventConditionType.MONSTER_KILL:
-      return (
-        matched.data.kill_monster_id === condition.kill_monster_id &&
-        matched.data.count >= condition.count
-      );
+      case EventConditionType.MONSTER_KILL:
+        return (
+          evaluation.data.kill_monster_id === condition.kill_monster_id &&
+          evaluation.data.count >= condition.count
+        );
 
-    default:
-      return false;
-  }
+      default:
+        return false;
+    }
+  });
 }
