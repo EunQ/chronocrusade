@@ -1,99 +1,146 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# ChronoCrusade Project OverView <br/> 이벤트 & 보상 시스템
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+## 📋 인증 및 사용자 시스템 (`auth` DB)
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+### 🔐 JWT 인증
 
-## Description
+모든 API는 JWT 기반 인증을 사용합니다. JWT에는 `id`, `roles[]` 정보가 포함됩니다.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
-
-## Project setup
-
-```bash
-$ npm install
+```json
+{
+  "id": "user1",
+  "roles": ["user"]
+}
 ```
 
-## Compile and run the project
+### 📌 API 목록
 
-```bash
-# development
-$ npm run start
+| Method | Endpoint       | 설명                  |
+| ------ | -------------- |---------------------|
+| POST   | `/auth/login`  | 로그인, JWT 토큰 발급      |
+| POST   | `/user/signup` | 회원가입                |
+| POST   | `/user`        | 사용자 본인 정보 수정        |
+| POST   | `/admin/user`  | Admin이 다른 사용자 정보 수정 |
 
-# watch mode
-$ npm run start:dev
+* 사용자 정보는 `users` 콜렉션에 저장되며, 다음것과 같은 필드로 구성됩니다:
 
-# production mode
-$ npm run start:prod
+| 필드명           | 설명                                        |
+| ------------- | ----------------------------------------- |
+| `id`          | 사용자 ID                                    |
+| `encPassword` | 암호화된 비밀번호                                 |
+| `roles[]`     | 사용자 역할 (user, admin, operator, auditor 등) |
+
+### 🔒 권한 제어
+
+기본적으로 다음 Guard 및 Decorator를 통해 보호됩니다:
+
+```ts
+@UseGuards(RoleGuard)
+@Roles(Role.USER)
+@MatchUser(true) //Request에 있는 userId와 JWT 토큰 ID를 비교.
 ```
 
-## Run tests
+---
 
-```bash
-# unit tests
-$ npm run test
+## 🎯 이벤트 시스템 (`game` DB)
 
-# e2e tests
-$ npm run test:e2e
+### 📘 이벤트 스키마 (`events` 켈렉션)
 
-# test coverage
-$ npm run test:cov
+| 필드명                     | 설명        |
+| ----------------------- |-----------|
+| `eventId`               | 이벤트 고유 ID |
+| `name`                  | 이벤트 이름    |
+| `description`           | 설명        |
+| `rewardIds[]`           | 연결된 보상 ID |
+| `conditions[]`          | 완료 조건     |
+| `startDate` / `endDate` | 기간        |
+| `isActive`              | 활성 상태     |
+| `version`               | 버전 관리용    |
+| `lastModifiedBy`        | 최종 수정자    |
+
+#### ✅ 조건 타입 예시
+
+```ts
+{ type: 'LOGIN_COUNT', loginCount: 5 }
+{ type: 'INVITE_FRIEND', invite_friend: 3 }
+{ type: 'MONSTER_KILL', kill_monster_id: 999, count: 5 }
 ```
 
-## Deployment
+---
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+## 🎁 보상 시스템 (`game` DB)
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+### 📘 보상 스키마 (`rewards` 컬렉션)
 
-```bash
-$ npm install -g mau
-$ mau deploy
+| 필드명              | 설명         |
+| ---------------- | ---------- |
+| `rewardId`       | 보상 ID      |
+| `eventId`        | 연결된 이벤트 ID |
+| `items[]`        | 지금 아이템들    |
+| `version`        | 보상 버전      |
+| `lastModifiedBy` | 수정자        |
+
+#### 🎁 보상 아이템 구조 예시
+
+```ts
+{
+  type: 'gold',
+  id: 'GOLD',
+  count: 100
+}
+
+// ItemType
+{
+  type: { type: String, required: true },
+  id: { type: String, default: null },
+  count: { type: Number, required: true },
+  meta: { type: Object, default: {} },
+},
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+---
 
-## Resources
+## 🧰 유저 리워드 시스템 (`user_rewards` 컬렉션)
 
-Check out a few resources that may come in handy when working with NestJS:
+| 필드명            | 설명                      |
+| -------------- |-------------------------|
+| `userId`       | 유저 ID                   |
+| `eventId`      | 이벤트 ID                  |
+| `eventVersion` | 이벤트 버전                  |
+| `status`       | `COMPLETED` 또는 `FAILED` |
+| `logSnapshot`  | 최근에 한 결과에 대한 로그         |
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+---
 
-## Support
+## 🧪 리워드 이력 로그 (`log` DB, `user_reward_logs` 컬렉션)
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+| 필드명                 | 설명                                |
+| ------------------- |-----------------------------------|
+| `userId`            | 유저 ID                             |
+| `gameEventSnapshot` | 이벤트 당시 스냅샷                        |
+| `rewardSnapshot`    | 보상 지금 내역 스냅샷                      |
+| `evaluations[]`     | 유저가 호출한 실제 평가 데이터                 |
+| `isConditionMet`    | 조건 충족 여부                          |
+| `status`            | `COMPLETED` / `FAILED`            |
+| `errorMessage`      | 실패 사유 예시: `"조건 실패: MONSTER_KILL"` |
 
-## Stay in touch
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+Log DB에는 `event_logs` `reward_logs` 각각 존재, event, reward가 수정될 때마다 적재함.
 
-## License
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+---
+
+## 🧱 DB 분리 구조 설계
+
+| DB 이름  | 목적                            |
+| ------ |-------------------------------|
+| `auth` | 로그인, 사용자 정보 ( 비밀번호 포함 )       |
+| `game` | 이벤트 / 보상 정의 / 유저의 이벤트 보상이력    |
+| `log`  | 유저 참여 및 리워드, 이벤트 수정 이력 저장     |
+| `lock` | 동시성 처리를 위한 Lock DB  |
+
+> **설계 의도**:
+>
+> * 마이크로서비스별 책임 분리
+> * 로그/기록용 DB는 별도로 분리하여 관리 유의성 향상
+> * Lock 설계 의도는 멀티 프로세스 및 쓰레딩 환경에서 일관성을 유지하기 위해. 
