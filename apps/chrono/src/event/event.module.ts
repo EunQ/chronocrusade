@@ -18,10 +18,18 @@ import { UpdateEventHandler } from './commands/update-event.handler';
     MongooseModule.forRoot(
       'mongodb://root:1234@localhost:27017/game?authSource=admin',
     ),
-    MongooseModule.forFeature([
-      { name: GameEvent.name, schema: EventSchema },
-      { name: GameEventLog.name, schema: EventLogSchema },
-    ]),
+    MongooseModule.forRoot(
+      'mongodb://root:1234@localhost:27017/log?authSource=admin',
+      {
+        connectionName: 'LOG',
+      },
+    ),
+
+    MongooseModule.forFeature([{ name: GameEvent.name, schema: EventSchema }]),
+    MongooseModule.forFeature(
+      [{ name: GameEventLog.name, schema: EventLogSchema }],
+      'LOG',
+    ),
   ],
   controllers: [EventController],
   providers: [

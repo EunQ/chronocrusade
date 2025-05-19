@@ -13,7 +13,7 @@ export class EventUpdatedEventHandler
   implements IEventHandler<EventUpdatedEvent>
 {
   constructor(
-    @InjectModel(GameEventLog.name)
+    @InjectModel(GameEventLog.name, 'LOG')
     private readonly eventLogModel: Model<EventLogDocument>,
   ) {}
 
