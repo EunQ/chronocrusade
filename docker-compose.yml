@@ -2,14 +2,61 @@ services:
   mongodb:
     image: mongo:latest
     container_name: my-mongodb
+    restart: always
     ports:
       - "27017:27017"
-    volumes:
-      - mongodb_data:/data/db
-      - ./mongo-init:/docker-entrypoint-initdb.d:ro
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: 1234
+    volumes:
+      - mongodb_data:/data/db
+      - ./mongo-init:/docker-entrypoint-initdb.d:ro
+
+  rosette:
+    build:
+      context: .
+      dockerfile: apps/rosette/Dockerfile
+    container_name: rosette-service
+    depends_on:
+      - mongodb
+    environment:
+      NODE_ENV: docker
+    env_file:
+      - ./config/.env.docker
+    ports:
+      - "8877:8877"
+    command: npm run start:docker-rosette
+
+  chrono:
+    build:
+      context: .
+      dockerfile: apps/chrono/Dockerfile
+    container_name: chrono-service
+    depends_on:
+      - mongodb
+    environment:
+      NODE_ENV: docker
+    env_file:
+      - ./config/.env.docker
+    ports:
+      - "8878:8878"
+    command: npm run start:docker-chrono
+
+  gateway:
+    build:
+      context: .
+      dockerfile: apps/gateway/Dockerfile
+    container_name: gateway-service
+    depends_on:
+      - rosette
+      - chrono
+    environment:
+      NODE_ENV: docker
+    env_file:
+      - ./config/.env.docker
+    ports:
+      - "3000:3000"
+    command: npm run start:docker-gateway
 
 volumes:
   mongodb_data:

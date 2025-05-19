@@ -14,6 +14,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule,
     CqrsModule,
     LockModule,
     MongooseModule.forRootAsync({

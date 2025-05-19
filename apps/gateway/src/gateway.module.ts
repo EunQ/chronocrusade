@@ -6,6 +6,12 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: [
+        `config/.env.${process.env.NODE_ENV ?? 'local'}`, // ex: .env.docker, .env.local
+      ],
+    }),
     ClientsModule.registerAsync([
       {
         name: 'ROSETTE_SERVICE',
