@@ -43,17 +43,18 @@ export class GatewayController {
   }
 
   @Post('/user/signin')
-  @UseGuards(RoleGuard)
-  @Roles(Role.ADMIN)
   async signin(@Body() body: CreateUserDto) {
     return await firstValueFrom(this.rosetteClient.send('sigin.user', body));
   }
 
   @Post('/user')
-  @UseGuards(RoleGuard)
-  @Roles(Role.ADMIN)
   async updateUser(@Body() body: UpdateUserDto) {
-    //Update할때는 admin 유저인경우, 패스워드로부터 자유로움.
+    return await firstValueFrom(this.rosetteClient.send('update.user', body));
+  }
+
+  @Post('/user')
+  @Roles(Role.ADMIN)
+  async adminUpdateUser(@Body() body: UpdateUserDto) {
     return await firstValueFrom(this.rosetteClient.send('update.user', body));
   }
 
