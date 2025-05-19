@@ -64,6 +64,8 @@ export class GatewayController {
   }
 
   @Post('/user')
+  @UseGuards(RoleGuard)
+  @Roles(Role.USER)
   async updateUser(@Body() body: UpdateUserDto) {
     return await firstValueFrom(
       this.rosetteClient.send('update.user', body).pipe(
@@ -110,6 +112,7 @@ export class GatewayController {
   이벤트 생성.
    */
   @Post('/event')
+  @UseGuards(RoleGuard)
   @Roles(Role.ADMIN, Role.OPERATOR)
   async createEvent(@Body() body: CreateEventDto): Promise<Any> {
     return firstValueFrom(
@@ -126,6 +129,7 @@ export class GatewayController {
   이벤트 수정.
    */
   @Put('/event')
+  @UseGuards(RoleGuard)
   @Roles(Role.ADMIN, Role.OPERATOR)
   async updateEvent(@Body() body: UpdateEventDto): Promise<Any> {
     return firstValueFrom(
@@ -142,6 +146,7 @@ export class GatewayController {
   보상 조회
    */
   @Get('/rewards')
+  @UseGuards(RoleGuard)
   @Roles(Role.ADMIN, Role.OPERATOR)
   async findAllReward(@Query() params: GetRewardListDto): Promise<Any> {
     return firstValueFrom(
@@ -158,6 +163,7 @@ export class GatewayController {
   보상 등록.
    */
   @Post('/reward')
+  @UseGuards(RoleGuard)
   @Roles(Role.ADMIN, Role.OPERATOR)
   async createReward(@Body() body: CreateRewardDto): Promise<Any> {
     return firstValueFrom(
@@ -174,6 +180,7 @@ export class GatewayController {
     보상 수정.
    */
   @Put('/reward')
+  @UseGuards(RoleGuard)
   @Roles(Role.ADMIN, Role.OPERATOR)
   async updateReward(@Body() body: UpdateRewardDto): Promise<Any> {
     return firstValueFrom(
