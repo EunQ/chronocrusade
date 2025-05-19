@@ -12,7 +12,7 @@ async function bootstrap() {
       transform: true,
     }),
   );
-  await app.listen(configService.get<number>('GATEWAY_PORT', 8878) ?? 3000);
+  await app.listen(configService.get<number>('GATEWAY_PORT', 3001));
 }
 
 bootstrap();

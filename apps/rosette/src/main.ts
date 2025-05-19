@@ -10,7 +10,7 @@ async function bootstrap() {
       transport: Transport.TCP,
       options: {
         host: process.env.ROSETTE_HOST || '127.0.0.1',
-        port: Number(process.env.ROSETTE_PORT) || 8877,
+        port: Number(process.env.ROSETTE_PORT) || 8887,
       },
     },
   );

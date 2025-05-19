@@ -5,13 +5,13 @@ import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
-    AuthModule,
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: [
         `config/.env.${process.env.NODE_ENV ?? 'local'}`, // ex: .env.docker, .env.local
       ],
     }),
+    AuthModule,
   ],
   controllers: [RosetteController],
   providers: [],

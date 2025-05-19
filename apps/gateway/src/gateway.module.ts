@@ -20,8 +20,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
         useFactory: (config: ConfigService) => ({
           transport: Transport.TCP,
           options: {
-            host: config.get<string>('ROSETTE_HOST', '127.0.0.1'),
-            port: config.get<number>('ROSETTE_PORT', 8877),
+            host: config.get<string>('ROSETTE_HOST'),
+            port: config.get<number>('ROSETTE_PORT'),
           },
         }),
       },
@@ -33,7 +33,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
           transport: Transport.TCP,
           options: {
             host: config.get<string>('CHRONO_HOST'),
-            port: config.get<number>('CHRONO_PORT', 8878),
+            port: config.get<number>('CHRONO_PORT'),
           },
         }),
       },

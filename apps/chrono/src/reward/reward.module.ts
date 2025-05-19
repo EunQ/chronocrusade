@@ -26,9 +26,9 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     }),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
+      connectionName: 'LOG',
       useFactory: async (config: ConfigService) => ({
         uri: config.get<string>('MONGODB_LOG_URI'),
-        connectionName: 'LOG',
       }),
       inject: [ConfigService],
     }),

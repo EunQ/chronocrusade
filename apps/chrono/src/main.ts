@@ -10,7 +10,7 @@ async function bootstrap() {
       transport: Transport.TCP,
       options: {
         host: process.env.CHRONO_HOST || '127.0.0.1',
-        port: Number(process.env.CHRONO_PORT) || 8877,
+        port: Number(process.env.CHRONO_PORT) || 8888,
       },
     },
   );
