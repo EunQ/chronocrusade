@@ -16,6 +16,10 @@ import { Role } from '../enums/roles.enum';
 export const ROLES_KEY = 'roles';
 export const Roles = (...roles: Role[]) => SetMetadata(ROLES_KEY, roles);
 
+// @MatchUser(..._
+export const USER_MATCH_KEY = 'matchUser';
+export const MatchUser = () => SetMetadata(USER_MATCH_KEY, true);
+
 @Injectable()
 export class RoleGuard implements CanActivate {
   constructor(
@@ -29,6 +33,11 @@ export class RoleGuard implements CanActivate {
       [context.getHandler(), context.getClass()],
     );
 
+    const matchUser = this.reflector.getAllAndOverride<boolean>(
+      USER_MATCH_KEY,
+      [context.getHandler(), context.getClass()],
+    );
+
     const req = context.switchToHttp().getRequest();
     const token = req.headers['authorization'];
     if (!token) throw new UnauthorizedException();
@@ -37,11 +46,22 @@ export class RoleGuard implements CanActivate {
       this.rosetteClient.send('auth/verify', { token }),
     );
 
+    //req.userId = user.id;
+
     if (requiredRoles?.length) {
-      const hasRole = user.roles?.some((r: Role) => requiredRoles.includes(r));
+      const hasRole = user.roles?.some((r: Role) =>
+        requiredRoles.includes(r),
+      );
       if (!hasRole) throw new ForbiddenException('권한이 올바르지 않습니다.');
     }
 
+    if (matchUser) {
+      const paramUserId =
+        req.params?.userId || req.body?.userId || req.query?.userId;
+      if (!paramUserId || paramUserId !== user.id) {
+        throw new ForbiddenException('사용자 정보가 일치하지 않습니다.');
+      }
+    }
     return true;
   }
 }
