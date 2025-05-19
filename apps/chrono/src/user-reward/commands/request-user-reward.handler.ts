@@ -38,7 +38,28 @@ export class RequestUserRewardHandler
     const event = await this.eventModel.findOne({ eventId }).lean();
 
     //이미 지급이 되었으면 넘어감.
-    const existing = await this.userRewardModel.findOne({ userId, eventId });
+    const existing = await this.userRewardModel.findOne(
+      { userId, eventId },
+      {
+        _id: 0,
+        __v: 0,
+        updatedAt: 0,
+        createdAt: 0,
+        'logSnapshot._id': 0,
+        'logSnapshot.__v': 0,
+        'logSnapshot.updatedAt': 0,
+        'logSnapshot.createdAt': 0,
+        'logSnapshot.rewardSnapshot._id': 0,
+        'logSnapshot.rewardSnapshot.__v': 0,
+        'logSnapshot.rewardSnapshot.updatedAt': 0,
+        'logSnapshot.rewardSnapshot.createdAt': 0,
+        'logSnapshot.gameEventSnapshot._id': 0,
+        'logSnapshot.gameEventSnapshot.__v': 0,
+        'logSnapshot.gameEventSnapshot.updatedAt': 0,
+        'logSnapshot.gameEventSnapshot.createdAt': 0,
+        'logSnapshot.evaluations._id': 0,
+      },
+    );
     if (existing && existing.status == UserRewardStatus.COMPLETED) {
       return existing;
     }
@@ -50,16 +71,6 @@ export class RequestUserRewardHandler
       event.isActive &&
       new Date(event.startDate) <= now &&
       now <= new Date(event.endDate);
-
-    // 실제 조건 평가 로직 (여기선 간단히 조건 key 포함 여부로 판단)
-    const failedConditions: string[] = [];
-    const allMatched = event.conditions.every((cond: any) => {
-      const matched = evaluateEventCondition(cond, evaluations);
-      if (!matched) {
-        failedConditions.push(`조건 실패: ${cond.type}`);
-      }
-      return matched;
-    });
 
     const reward = await this.rewardModel.findOne({ eventId }).lean();
     const resourceId = `${userId}-${eventId}`;
