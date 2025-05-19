@@ -36,16 +36,20 @@ export class RequestUserRewardHandler
     const { userId, eventId, eventVersion, evaluations } = command;
 
     const event = await this.eventModel.findOne({ eventId }).lean();
-    if (!event || event.version !== eventVersion) {
-      //이벤트 조건이 없는경우.
-      return this.userRewardModel.create({
-        userId,
-        eventId,
-        eventVersion,
-        evaluations,
-        status: UserRewardStatus.FAILED,
-      });
+
+    //이미 지급이 되었으면 넘어감.
+    const existing = await this.userRewardModel.findOne({ userId, eventId });
+    if (existing && existing.status == UserRewardStatus.COMPLETED) {
+      return existing;
     }
+
+    const now = new Date();
+    const isEventValid =
+      event &&
+      event.version === eventVersion &&
+      event.isActive &&
+      new Date(event.startDate) <= now &&
+      now <= new Date(event.endDate);
 
     // 실제 조건 평가 로직 (여기선 간단히 조건 key 포함 여부로 판단)
     const failedConditions: string[] = [];
@@ -57,15 +61,7 @@ export class RequestUserRewardHandler
       return matched;
     });
 
-    const errorMessage = allMatched
-      ? null
-      : failedConditions.join(', ') || '조건 불일치';
-    const status = allMatched
-      ? UserRewardStatus.COMPLETED
-      : UserRewardStatus.FAILED;
-
     const reward = await this.rewardModel.findOne({ eventId }).lean();
-
     const resourceId = `${userId}-${eventId}`;
     const locked = this.lockService.acquireLock(
       UserReward.name,
@@ -80,10 +76,25 @@ export class RequestUserRewardHandler
     }
 
     try {
-      //실제 혜택을 지급하는 로직이 여기에 추가.
-      const existing = await this.userRewardModel.findOne({ userId, eventId });
-      if (existing && existing.status == UserRewardStatus.COMPLETED) {
-        return existing;
+      let status = UserRewardStatus.FAILED;
+      let errorMessage: string | null = null;
+      let allMatched = false;
+
+      if (!isEventValid) {
+        errorMessage = '이벤트가 종료되었거나 유효하지 않습니다';
+      } else {
+        const failedConditions: string[] = [];
+        allMatched = event.conditions.every((cond: any) => {
+          const matched = evaluateEventCondition(cond, evaluations);
+          if (!matched) failedConditions.push(`조건 실패: ${cond.type}`);
+          return matched;
+        });
+
+        if (allMatched) {
+          status = UserRewardStatus.COMPLETED;
+        } else {
+          errorMessage = failedConditions.join(', ') || '조건 불일치';
+        }
       }
 
       //로그 저장
