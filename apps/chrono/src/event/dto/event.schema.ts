@@ -2,6 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import { EventCondition } from './event-condition.type';
 import { EventConditionSchema } from './event-condition.schema';
+import { generateEventId } from '../../../../../utils/id-gen';
 
 export type EventDocument = GameEvent & Document;
 
@@ -38,4 +39,13 @@ export class GameEvent {
   lastModifiedBy: string;
 }
 
-export const EventSchema = SchemaFactory.createForClass(GameEvent);
+const EventSchema = SchemaFactory.createForClass(GameEvent);
+
+EventSchema.pre('save', function (next) {
+  if (!this.eventId) {
+    this.eventId = generateEventId();
+  }
+  next();
+});
+
+export { EventSchema };

@@ -53,4 +53,11 @@ export class GatewayController {
   async findAllEvents(): Promise<Event> {
     return firstValueFrom(this.chronoClient.send('/events', {}));
   }
+
+  @Get('/events2')
+  //@UseGuards(RoleGuard)
+  //@Roles(['operator', 'admin'])
+  async findAllEvents2(): Promise<Event> {
+    return firstValueFrom(this.chronoClient.send('/events2', {}));
+  }
 }

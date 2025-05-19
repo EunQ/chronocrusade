@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
+import { generateRewardId } from '../../../../../utils/id-gen';
 
 export class CouponReward {
   @Prop({ required: true })
@@ -31,4 +32,14 @@ export class Reward {
 }
 
 export type RewardDocument = Reward & Document;
-export const RewardSchema = SchemaFactory.createForClass(Reward);
+
+const RewardSchema = SchemaFactory.createForClass(Reward);
+
+RewardSchema.pre('save', function (next) {
+  if (!this.rewardId) {
+    this.rewardId = generateRewardId();
+  }
+  next();
+});
+
+export { RewardSchema };
